@@ -1,5 +1,5 @@
 <script type="text/x-red" data-help-name="ui_time_scheduler">
-    <p>A ui scheduler for the Node-RED Dashboard</p>
+    <p>A ui alarm clock for the Node-RED Dashboard</p>
 
     <h3>Inputs</h3>
     <dl class="message-properties">
@@ -34,17 +34,17 @@
     </ol>
 
     <h3>Details</h3>
-    <p> If you changed the node-red <a href="https://nodered.org/docs/user-guide/context#context-stores">contextStorage to localfilesystem</a>, 
+    <p> If you changed the node-red <a href="https://nodered.org/docs/user-guide/context#context-stores">contextStorage to localfilesystem</a>,
         schedules are automatically saved and restored after a reboot.
         Otherwise incoming <code>msg.payload</code> is used as the schedule data.
-        You can use that to inject a predefined schedule after a certain event or 
-        just after a reboot. If there is no incoming payload or the incoming 
-        payload is not a valid schedule a new and empty schedule will be created. 
+        You can use that to inject a predefined schedule after a certain event or
+        just after a reboot. If there is no incoming payload or the incoming
+        payload is not a valid schedule a new and empty schedule will be created.
     </p>
-    <p> To create a new schedule click the nodes plus sign at the right top 
+    <p> To create a new schedule click the nodes plus sign at the right top
         corner (at the frontend/dashboard)
     </p>
-    <p> The section <code>Devices</code> must contain at least 1 device and offers 
+    <p> The section <code>Devices</code> must contain at least 1 device and offers
         the possibility to add many more. Every device has a node output and an
         independent schedule at the ui dashboard.
     </p>
@@ -57,8 +57,8 @@
     <p> If the <code>Single off</code> property is checked the node will only output
         "off" payloads at a timers defined end time.
     </p>
-    <p> If the <code>Block</code> property is checked the node will only output anything 
-        if the current value is different from the previous value. The value after a 
+    <p> If the <code>Block</code> property is checked the node will only output anything
+        if the current value is different from the previous value. The value after a
         deploy (or reboot) is "undefined".
     </p>
 

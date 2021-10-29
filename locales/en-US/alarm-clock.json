@@ -1,5 +1,5 @@
 {
-    "time-scheduler": {
+    "alarm-clock": {
         "payloadReceived": "Payload received.",
         "invalidPayload": "Payload invalid.",
         "contextCreated": "Context created.",
