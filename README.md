@@ -4,7 +4,7 @@ A node-red-ui alarm clock for the Node-RED Dashboard.
 Based on the awesome [node-red-contrib-ui-time-scheduler
 ](https://github.com/fellinga/node-red-contrib-ui-time-scheduler)
 
-![](images/ui.jpg)
+![](images/ui.png)
 
 ## Install
   
@@ -37,7 +37,7 @@ Every other output (number of total outputs depends on how many alarms you have 
   
 You can use the JSON string from the nodes top output to directly inject timers after a (re)boot or (re)deploy. See `examples` dir.
 
-![](images/flow.jpg)
+![](images/flow.png)
 
 If you changed the node-red <a target="blank" href="https://nodered.org/docs/user-guide/context#context-stores">contextStorage to localfilesystem</a>, timers are automatically saved and restored after a reboot.
 
