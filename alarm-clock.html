@@ -9,9 +9,9 @@
         <input type="hidden" id="node-input-height">
         <button class="editor-button" id="node-input-size"></button>
     </div>
-    <label for="form-row node-input-alarm-container-row"><i class="fa fa-clock"></i> <span data-i18n="alarm-clock.label.alarms"></span> </label>
-    <div class="form-row node-input-alarm-container-row">
-        <ol id="node-input-alarm-container"></ol>
+    <label for="form-row node-input-alarm-name-container-row"><i class="fa fa-clock"></i> <span data-i18n="alarm-clock.label.alarms"></span> </label>
+    <div class="form-row node-input-alarm-name-container-row">
+        <ol id="node-input-alarm-name-container"></ol>
     </div>
     <div class="form-row">
         <label for="node-input-startDay"><i class="fa fa-calendar"></i> <span data-i18n="alarm-clock.label.startDay"></span> </label>
@@ -54,7 +54,7 @@
             name: { value: '' },
             startDay: { value: 0 },
             refresh: { value: 60 },
-            alarms: { value: ["Alarm 1"] },
+            alarm_names: { value: ["Alarm 1"] },
             lat: { value: '' },
             lon: { value: '' },
             customContextStore: { value: '' },
@@ -107,7 +107,7 @@
                 $('#node-div-customContextStore').hide();
             }
 
-            $("#node-input-alarm-container").css('min-height', '165px').editableList({
+            $("#node-input-alarm-name-container").css('min-height', '165px').editableList({
                 addItem: function(row, index, data) {
                     const current = node._("alarm-clock.label.alarm") + " " + (index + 1);
 
@@ -121,8 +121,8 @@
                     finalspan.append(' &#8594; <span class="node-input-alarm-index">' + (index + 2) + '</span> ');
                 },
                 removeItem: function(opt) {
-                    const alarms = $("#node-input-alarm-container").editableList('items');
-                    alarms.each(function(i) {
+                    const alarm_names = $("#node-input-alarm-name-container").editableList('items');
+                  alarm_names.each(function(i) {
                         $(this).find(".node-input-alarm-label").html(node._("alarm-clock.label.alarm") + " " + (i + 1));
                         const name = $(this).find(".node-input-alarm-name").typedInput('value');
                         const regex = new RegExp("^" + node._("alarm-clock.label.alarm") + " \\d+$")
@@ -132,11 +132,11 @@
                         $(this).find(".node-input-alarm-index").html(i + 2);
                     });
 
-                    if (alarms.length === 0) $("#node-input-alarm-container").editableList('addItem', {});
+                    if (alarm_names.length === 0) $("#node-input-alarm-name-container").editableList('addItem', {});
                 },
                 sortItems: function(rules) {
-                    const alarms = $("#node-input-alarm-container").editableList('items');
-                    alarms.each(function(i) {
+                    const alarm_names = $("#node-input-alarm-name-container").editableList('items');
+                    alarm_names.each(function(i) {
                         $(this).find(".node-input-alarm-label").html(node._("alarm-clock.label.alarm") + " " + (i + 1));
                         const name = $(this).find(".node-input-alarm-name").typedInput('value');
                         const regex = new RegExp("^" + node._("alarm-clock.label.alarm") + " \\d+$")
@@ -152,30 +152,30 @@
 
             if (!this.startDay) $("#node-input-startDay").val(0).change();
             if (!this.refresh) $("#node-input-refresh").val(60);
-            if (!this.alarms) {
-                $("#node-input-alarm-container").editableList('addItem', { name: this.name });
+            if (!this.alarm_names) {
+                $("#node-input-alarm-name-container").editableList('addItem', { name: this.name });
             } else {
-                for (let i = 0; i < this.alarms.length; i++) {
-                    $("#node-input-alarm-container").editableList('addItem', { name: this.alarms[i] });
+                for (let i = 0; i < this.alarm_names.length; i++) {
+                    $("#node-input-alarm-name-container").editableList('addItem', { name: this.alarm_names[i] });
                 }
             }
         },
         oneditsave: function() {
             const node = this;
 
-            node.alarms = [];
-            const alarms = $("#node-input-alarm-container").editableList('items');
-            alarms.each(function(i) {
+            node.alarm_names = [];
+            const alarm_names = $("#node-input-alarm-name-container").editableList('items');
+            alarm_names.each(function(i) {
                 const alarm = $(this);
                 let alarmName = alarm.find(".node-input-alarm-name").typedInput('value');
                 alarmName = alarmName === "" ? node._("alarm-clock.label.alarm") + " " + (i + 1) : alarmName;
-                while (node.alarms.includes(alarmName)) {
+                while (node.alarm_names.includes(alarmName)) {
                     alarmName = alarmName + "_" + node._("alarm-clock.copy");
                 }
-                node.alarms.push(alarmName);
+                node.alarm_names.push(alarmName);
             });
 
-            node.outputs = 1 + alarms.length;
+            node.outputs = 1 + alarm_names.length;
         },
         oneditresize: function(size) {
         }

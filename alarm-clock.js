@@ -84,12 +84,12 @@ module.exports = function(RED) {
 		const alarmBody = String.raw`
 		<div id="${divPrimary}" ng-init='init(${JSON.stringify(config)})'>
 			<div layout="row" layout-align="space-between center" style="max-height: 50px;">
-				<span flex="65" ng-show="alarms.length <= 1" style="height:50px; line-height: 50px;"> ${config.alarms[0]} </span>
-				<span flex="65" ng-show="alarms.length > 1">
+				<span flex="65" ng-show="alarm_names.length <= 1" style="height:50px; line-height: 50px;"> ${config.alarm_names[0]} </span>
+				<span flex="65" ng-show="alarm_names.length > 1">
 					<md-input-container>
 						<md-select class="nr-dashboard-dropdown" ng-model="myAlarmSelect" ng-change="showStandardView()" aria-label="Select alarm" ng-disabled="isEditMode">
 							<md-option value="overview"> ${RED._("alarm-clock.ui.overview")} </md-option>
-							<md-option ng-repeat="alarm in alarms" value={{$index}}> {{alarms[$index]}} </md-option>
+							<md-option ng-repeat="alarm_name in alarm_names" value={{$index}}> {{alarm_names[$index]}} </md-option>
 						</md-select>
 					</md-input-container>
 				</span>
@@ -117,9 +117,9 @@ module.exports = function(RED) {
 			</div>
 			<div id="messageBoard-${uniqueId}" style="display:none;"> <p> </p> </div>
 			<div id="overview-${uniqueId}" style="display:none;">
-				<div ng-repeat="alarm in alarms track by $index">
+				<div ng-repeat="alarm_name in alarm_names track by $index">
 					<md-list flex ng-cloak ng-if="(filteredAlarms = (getAlarmsByOverviewFilter() | filter:{ output: $index.toString() }:true)).length">
-						<md-subheader> <span class="md-subhead"> {{alarms[$index]}} </span> </md-subheader>
+						<md-subheader> <span class="md-subhead"> {{alarm_names[$index]}} </span> </md-subheader>
 						<md-list-item ng-repeat="alarm in filteredAlarms" style="min-height: 25px; height: 25px; padding: 0 2px;">
 							<span style="overflow-x: hidden; {{(alarm.disabled || !isAlarmEnabled(alarm.output)) ? 'opacity: 0.4;' : ''}}">
 								{{millisToTime(alarm.alarmtime)}}
@@ -271,7 +271,7 @@ module.exports = function(RED) {
 			if (!config.hasOwnProperty("startDay")) config.startDay = 0;
 			if (!config.hasOwnProperty("height") || config.height === 0) config.height = 1;
 			if (!config.hasOwnProperty("name") || config.name === "") config.name = "Alarm-Clock";
-			if (!config.hasOwnProperty("alarms") || config.alarms.length === 0) config.alarms = [config.name];
+			if (!config.hasOwnProperty("alarm_names") || config.alarm_names.length === 0) config.alarm_names = [config.name];
 			// END check props
 			config.i18n = RED._("alarm-clock.ui", { returnObjects: true });
 			config.solarEventsEnabled = ((config.lat !== "" && isFinite(config.lat) && Math.abs(config.lat) <= 90) && (config.lon !== "" && isFinite(config.lon) && Math.abs(config.lon) <= 180));
@@ -315,7 +315,7 @@ module.exports = function(RED) {
 							const parsedAlarms = parsedInput.alarms;
 							if (validateAlarms(parsedAlarms)) {
 								node.status({ fill: "green", shape: "dot", text: "alarm-clock.payloadReceived" });
-								setAlarams(parsedAlarms.filter(alarm => alarm.output < config.alarms.length));
+								setAlarams(parsedAlarms.filter(alarm => alarm.output < config.alarm_names.length));
 							} else {
 								node.status({ fill: "yellow", shape: "dot", text: "alarm-clock.invalidPayload" });
 							}
@@ -344,8 +344,8 @@ module.exports = function(RED) {
 						$scope.nodeId = config.id;
 						$scope.i18n = config.i18n;
 						$scope.days = config.i18n.days;
-						$scope.alarms = config.alarms;
-						$scope.myAlarmSelect = $scope.alarms.length > 1 ? "overview" : "0";
+						$scope.alarm_names = config.alarm_names;
+						$scope.myAlarmSelect = $scope.alarm_names.length > 1 ? "overview" : "0";
 					}
 
 					$scope.$watch('msg', function() {
@@ -568,7 +568,7 @@ module.exports = function(RED) {
 				let alarms = getContextValue('alarms');
 				if (validateAlarms(alarms)) {
 					node.status({});
-					alarms = alarms.filter(alarm => alarm.output < config.alarms.length);
+					alarms = alarms.filter(alarm => alarm.output < config.alarm_names.length);
 				} else {
 					node.status({ fill: "green", shape: "dot", text: "alarm-clock.contextCreated" });
 					alarms = [];
@@ -629,8 +629,8 @@ module.exports = function(RED) {
 
 			function addDisabledAlarm(alarm) {
 				const disabledAlarms = getDisabledAlarms();
-				const alarmIndex = (isNaN(alarm) ? config.alarms.indexOf(alarm) : alarm).toString();
-				if (alarmIndex >= 0 && config.alarms.length > alarmIndex && !disabledAlarms.includes(alarmIndex)) {
+				const alarmIndex = (isNaN(alarm) ? config.alarm_names.indexOf(alarm) : alarm).toString();
+				if (alarmIndex >= 0 && config.alarm_names.length > alarmIndex && !disabledAlarms.includes(alarmIndex)) {
 					disabledAlarms.push(alarmIndex);
 					setDisabledAlarms(disabledAlarms);
 					return true;
@@ -640,8 +640,8 @@ module.exports = function(RED) {
 
 			function removeDisabledAlarm(alarm) {
 				const disabledAlarms = getDisabledAlarms();
-				const alarmIndex = (isNaN(alarm) ? config.alarms.indexOf(alarm) : alarm).toString();
-				if (alarmIndex >= 0 && config.alarms.length > alarmIndex && disabledAlarms.includes(alarmIndex)) {
+				const alarmIndex = (isNaN(alarm) ? config.alarm_names.indexOf(alarm) : alarm).toString();
+				if (alarmIndex >= 0 && config.alarm_names.length > alarmIndex && disabledAlarms.includes(alarmIndex)) {
 					disabledAlarms.splice(disabledAlarms.indexOf(alarmIndex), 1);
 					setDisabledAlarms(disabledAlarms);
 					return true;
@@ -665,9 +665,9 @@ module.exports = function(RED) {
 			}
 
 			function addOutputValues(outputValues) {
-				for (let alarm = 0; alarm < config.alarms.length; alarm++) {
+				for (let alarm = 0; alarm < config.alarm_names.length; alarm++) {
 					const msg = { payload: isInTime(alarm) };
-					msg.topic = config.alarms[alarm];
+					msg.topic = config.alarm_names[alarm];
 					msg.payload != null ? outputValues.push(msg) : outputValues.push(null);
 				}
 				removeUnchangedValues(outputValues);
@@ -675,7 +675,7 @@ module.exports = function(RED) {
 
 			function removeUnchangedValues(outputValues) {
 				const currMsg = JSON.parse(JSON.stringify(outputValues));
-				for (let i = 1; i <= config.alarms.length; i++) {
+				for (let i = 1; i <= config.alarm_names.length; i++) {
 					if (prevMsg[i] && currMsg[i] && (prevMsg[i].payload === currMsg[i].payload)) {
 						outputValues[i] = null;
 					}
@@ -749,7 +749,7 @@ module.exports = function(RED) {
 			}
 
 			function getNodeData() {
-				return { alarm: getAlarms(), settings: getSettings() };
+				return { alarms: getAlarms(), settings: getSettings() };
 			}
 
 			function serializeData() {
