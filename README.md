@@ -4,6 +4,8 @@ A node-red-ui alarm clock for the Node-RED Dashboard.
 Based on the awesome [node-red-contrib-ui-time-scheduler
 ](https://github.com/fellinga/node-red-contrib-ui-time-scheduler)
 
+![](images/ui.jpg)
+
 ## Install
   
 You can install this node directly from the "Manage Palette" menu in the Node-RED interface.  
@@ -23,17 +25,20 @@ Click the plus sign at the top right corner of the node to create a new timer.
 ### Input
   
 You can inject timers via a msg property `payload` (see [restoring schedules after a reboot](#Restoring-schedules-after-a-reboot) section). If the injected msg has a property `disableAlarm` or `enableAlarm` the node will disable/enable the alarms output. Disabling/enabling works both with alarm name and index.
+If you inject `getStatus` you can get the next trigger for each alarm (epoch).
   
 ### Output
   
 Whenever you add, edit or delete a timer a JSON string is sent to the nodes top output. This JSON string contains all timers and settings.
 
-Every other output (number of total outputs depends on how many alarms you have added) emits true/false every 60 seconds. In Event Mode the event is only sent at the specified time. Adjusting the refresh rate, choosing if a msg.`topic` is sent and if messages are blocked unless the value has changed is possible within the node's options.
+Every other output (number of total outputs depends on how many alarms you have added) emits true once an alarm is triggered. Adjusting the refresh rate is possible within the node's options.
 
 ### Restoring schedules after a reboot
   
-You can use the JSON string from the nodes top output to directly inject timers after a (re)boot or (re)deploy:
-   
+You can use the JSON string from the nodes top output to directly inject timers after a (re)boot or (re)deploy. See `examples` dir.
+
+![](images/flow.jpg)
+
 If you changed the node-red <a target="blank" href="https://nodered.org/docs/user-guide/context#context-stores">contextStorage to localfilesystem</a>, timers are automatically saved and restored after a reboot.
 
   

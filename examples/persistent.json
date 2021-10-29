@@ -1,0 +1,188 @@
+[
+  {
+    "id": "cdea604ed57bfc72",
+    "type": "tab",
+    "label": "Flow 1",
+    "disabled": false,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "9b066b4b0d2b12d5",
+    "type": "inject",
+    "z": "cdea604ed57bfc72",
+    "name": "Fire after reboot",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payloadType": "date",
+    "x": 190,
+    "y": 120,
+    "wires": [
+      [
+        "6fe39fbeb109a0e0"
+      ]
+    ]
+  },
+  {
+    "id": "6fe39fbeb109a0e0",
+    "type": "file in",
+    "z": "cdea604ed57bfc72",
+    "name": "Get config",
+    "filename": "/data/time-schedule.json",
+    "format": "utf8",
+    "chunk": false,
+    "sendError": false,
+    "encoding": "none",
+    "allProps": false,
+    "x": 390,
+    "y": 120,
+    "wires": [
+      [
+        "d4af3b6fecb277e9"
+      ]
+    ]
+  },
+  {
+    "id": "b7af581d7da25abe",
+    "type": "file",
+    "z": "cdea604ed57bfc72",
+    "name": "Save config",
+    "filename": "/data/time-schedule.json",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "true",
+    "encoding": "none",
+    "x": 610,
+    "y": 180,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "d4af3b6fecb277e9",
+    "type": "ui_alarm_clock",
+    "z": "cdea604ed57bfc72",
+    "group": "b04f047e279d7b75",
+    "name": "ui alarm clock",
+    "startDay": 0,
+    "refresh": 60,
+    "alarm_names": [
+      "Alarm 1",
+      "Alarm 2"
+    ],
+    "lat": "1.1",
+    "lon": "1.1",
+    "customContextStore": "",
+    "outputs": 3,
+    "order": 1,
+    "width": "6",
+    "height": "7",
+    "x": 320,
+    "y": 220,
+    "wires": [
+      [
+        "b7af581d7da25abe"
+      ],
+      [
+        "84ab8ec89377663d"
+      ],
+      [
+        "7defa78c231b61d1"
+      ]
+    ]
+  },
+  {
+    "id": "84ab8ec89377663d",
+    "type": "debug",
+    "z": "cdea604ed57bfc72",
+    "name": "alarm 1",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 600,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "7defa78c231b61d1",
+    "type": "debug",
+    "z": "cdea604ed57bfc72",
+    "name": "alarm 1",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 580,
+    "y": 340,
+    "wires": []
+  },
+  {
+    "id": "f835ca41bb0488a1",
+    "type": "inject",
+    "z": "cdea604ed57bfc72",
+    "name": "get status",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "getStatus",
+        "v": "true",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payloadType": "date",
+    "x": 140,
+    "y": 340,
+    "wires": [
+      [
+        "d4af3b6fecb277e9"
+      ]
+    ]
+  },
+  {
+    "id": "b04f047e279d7b75",
+    "type": "ui_group",
+    "name": "Schedulers",
+    "tab": "f59bac5ad56e740e",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false,
+    "className": ""
+  },
+  {
+    "id": "f59bac5ad56e740e",
+    "type": "ui_tab",
+    "name": "Home",
+    "icon": "dashboard",
+    "disabled": false,
+    "hidden": false
+  }
+]
