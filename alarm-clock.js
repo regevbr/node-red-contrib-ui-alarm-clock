@@ -81,7 +81,7 @@ module.exports = function(RED) {
 		</style>
 		`;
 
-		const timerBody = String.raw`
+		const alarmBody = String.raw`
 		<div id="${divPrimary}" ng-init='init(${JSON.stringify(config)})'>
 			<div layout="row" layout-align="space-between center" style="max-height: 50px;">
 				<span flex="65" ng-show="alarms.length <= 1" style="height:50px; line-height: 50px;"> ${config.alarms[0]} </span>
@@ -118,28 +118,28 @@ module.exports = function(RED) {
 			<div id="messageBoard-${uniqueId}" style="display:none;"> <p> </p> </div>
 			<div id="overview-${uniqueId}" style="display:none;">
 				<div ng-repeat="alarm in alarms track by $index">
-					<md-list flex ng-cloak ng-if="(filteredAlarmTimers = (getTimersByOverviewFilter() | filter:{ output: $index.toString() }:true)).length">
+					<md-list flex ng-cloak ng-if="(filteredAlarms = (getAlarmsByOverviewFilter() | filter:{ output: $index.toString() }:true)).length">
 						<md-subheader> <span class="md-subhead"> {{alarms[$index]}} </span> </md-subheader>
-						<md-list-item ng-repeat="timer in filteredAlarmTimers" style="min-height: 25px; height: 25px; padding: 0 2px;">
-							<span style="overflow-x: hidden; {{(timer.disabled || !isAlarmEnabled(timer.output)) ? 'opacity: 0.4;' : ''}}">
-								{{millisToTime(timer.alarmtime)}}
+						<md-list-item ng-repeat="alarm in filteredAlarms" style="min-height: 25px; height: 25px; padding: 0 2px;">
+							<span style="overflow-x: hidden; {{(alarm.disabled || !isAlarmEnabled(alarm.output)) ? 'opacity: 0.4;' : ''}}">
+								{{millisToTime(alarm.alarmtime)}}
 							</span>
-							<div class="md-secondary" style=" {{(timer.disabled || !isAlarmEnabled(timer.output)) ? 'opacity: 0.4' : ''}};">
-								<span ng-repeat="day in days | limitTo : ${config.startDay}-7" ng-init="dayIndex=$index+${config.startDay}">{{timer.days[localDayToUtc(timer,dayIndex)]===1 ? ($index!=0 ? "&nbsp;" : "")+days[dayIndex] : ""}}</span>
-								<span ng-repeat="day in days | limitTo : -${config.startDay}" ng-init="dayIndex=$index">{{timer.days[localDayToUtc(timer,dayIndex)]===1 ? ($index!=0 ? "&nbsp;" : "")+days[dayIndex] : ""}}</span>
+							<div class="md-secondary" style=" {{(alarm.disabled || !isAlarmEnabled(alarm.output)) ? 'opacity: 0.4' : ''}};">
+								<span ng-repeat="day in days | limitTo : ${config.startDay}-7" ng-init="dayIndex=$index+${config.startDay}">{{alarm.days[localDayToUtc(alarm,dayIndex)]===1 ? ($index!==0 ? "&nbsp;" : "")+days[dayIndex] : ""}}</span>
+								<span ng-repeat="day in days | limitTo : -${config.startDay}" ng-init="dayIndex=$index">{{alarm.days[localDayToUtc(alarm,dayIndex)]===1 ? ($index!==0 ? "&nbsp;" : "")+days[dayIndex] : ""}}</span>
 							</div>
 							<md-divider ng-if="!$last"></md-divider>
 						</md-list-item>
 					<md-list>
 				</div>
-				<div ng-if="timers.length == 0">
+				<div ng-if="alarms.length == 0">
 					<p> ${RED._("alarm-clock.ui.emptyOverview")} <p>
 				</div>
-				<div ng-if="timers.length != 0 && getTimersByOverviewFilter().length == 0">
+				<div ng-if="alarms.length != 0 && getAlarmsByOverviewFilter().length == 0">
 					<p> ${RED._("alarm-clock.ui.noActiveOverview")} <p>
 				</div>
 			</div>
-			<div id="timersView-${uniqueId}">
+			<div id="alarmsView-${uniqueId}">
 				<md-list flex ng-cloak style="text-align: center">
 					<md-subheader>
 						<div layout="row" class="md-subhead">
@@ -148,19 +148,19 @@ module.exports = function(RED) {
 							<span flex="40"> ${RED._("alarm-clock.ui.alarm")} </span>
 						</div>
 					</md-subheader>
-					<md-list-item class="md-2-line" style="height: 74px; padding: 0 5px; border-left: 2px solid {{timer.disabled ? 'red' : timer.alarmSolarEvent ? '#FCD440' : 'transparent'}};" ng-repeat="timer in timers | filter:{ output: myAlarmSelect }:true track by $index">
-						<div class="md-list-item-text" ng-click="showAddView(timers.indexOf(timer))" style="opacity:{{timer.disabled ? 0.4 : 1}};">
+					<md-list-item class="md-2-line" style="height: 74px; padding: 0 5px; border-left: 2px solid {{alarm.disabled ? 'red' : alarm.alarmSolarEvent ? '#FCD440' : 'transparent'}};" ng-repeat="alarm in alarms | filter:{ output: myAlarmSelect }:true track by $index">
+						<div class="md-list-item-text" ng-click="showAddView(alarms.indexOf(alarm))" style="opacity:{{alarm.disabled ? 0.4 : 1}};">
 							<div layout="row">
 								<span flex=""> {{$index+1}} </span>
 								<span flex="45"></span>
-								<span flex="40"> {{millisToTime(timer.alarmtime)}} </span>
+								<span flex="40"> {{millisToTime(alarm.alarmtime)}} </span>
 							</div>
 							<div layout="row" style="padding-top: 4px; padding-bottom: 4px;">
 								<span flex="" ng-repeat="day in days | limitTo : ${config.startDay}-7" ng-init="dayIndex=$index+${config.startDay}">
-									<span class="weekDay {{(timer.days[localDayToUtc(timer,dayIndex)]) ? 'weekDayActive' : ''}}"> {{days[dayIndex]}} </span>
+									<span class="weekDay {{(alarm.days[localDayToUtc(alarm,dayIndex)]) ? 'weekDayActive' : ''}}"> {{days[dayIndex]}} </span>
 								</span>
 								<span flex="" ng-repeat="day in days | limitTo : -${config.startDay}" ng-init="dayIndex=$index">
-									<span class="weekDay {{(timer.days[localDayToUtc(timer,dayIndex)]) ? 'weekDayActive' : ''}}"> {{days[dayIndex]}} </span>
+									<span class="weekDay {{(alarm.days[localDayToUtc(alarm,dayIndex)]) ? 'weekDayActive' : ''}}"> {{days[dayIndex]}} </span>
 								</span>
 							</div>
 						</div>
@@ -168,25 +168,25 @@ module.exports = function(RED) {
 					</md-list-item>
 				<md-list>
 			</div>
-			<div id="addTimerView-${uniqueId}" style="display:none; position: relative;">
-				<form ng-submit="addTimer()" style="width: 100%; position: absolute;">
+			<div id="addAlarmView-${uniqueId}" style="display:none; position: relative;">
+				<form ng-submit="addAlarm()" style="width: 100%; position: absolute;">
 					<div ng-show="!showSunSettings">
 						<div layout="row" layout-align="space-between none" style="max-height: 60px;">
-							<md-input-container flex="50" ng-show="formtimer.alarmtype === 'custom'" style="margin-left: 0">
+							<md-input-container flex="50" ng-show="formalarm.alarmtype === 'custom'" style="margin-left: 0">
 								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.alarmtime")}</label>
-								<input id="timerAlarmTime-${uniqueId}" value="08:00" type="time" required pattern="^([0-1][0-9]|2[0-3]):([0-5][0-9])$">
+								<input id="alarmTime-${uniqueId}" value="08:00" type="time" required pattern="^([0-1][0-9]|2[0-3]):([0-5][0-9])$">
 								<span class="validity"></span>
 							</md-input-container>
-							<md-input-container flex="50" ng-if="formtimer.alarmtype !== 'custom'" style="margin-left: 0">
+							<md-input-container flex="50" ng-if="formalarm.alarmtype !== 'custom'" style="margin-left: 0">
 								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.alarmtime")}</label>
-								<input ng-model="formtimer.solarAlarmTimeLabel" type="text" required disabled>
+								<input ng-model="formalarm.solarAlarmTimeLabel" type="text" required disabled>
 								<span class="validity"></span>
 							</md-input-container>
 						</div>
 						<div layout="row" style="max-height: 50px;">
 							<md-input-container>
 								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.daysActive")}</label>
-								<md-select class="nr-dashboard-dropdown" multiple="true" placeholder="${RED._("alarm-clock.ui.daysActive")}" ng-model="formtimer.dayselect" ng-change="daysChanged()" >
+								<md-select class="nr-dashboard-dropdown" multiple="true" placeholder="${RED._("alarm-clock.ui.daysActive")}" ng-model="formalarm.dayselect" ng-change="daysChanged()" >
 									<md-option value="all"><em>${RED._("alarm-clock.ui.selectAll")}</em></md-option>
 									<md-option ng-repeat="day in days | limitTo : ${config.startDay}-7" ng-init="$index=$index+${config.startDay}" value={{$index}}> {{days[$index]}} </md-option>
 									<md-option ng-repeat="day in days | limitTo : -${config.startDay}" value={{$index}}> {{days[$index]}} </md-option>
@@ -194,12 +194,12 @@ module.exports = function(RED) {
 							</md-input-container>
 						</div>
 						<div layout="row" layout-align="space-between end" style="height: 40px;">
-							<md-button style="margin: 1px;" ng-if="formtimer.index !== undefined" ng-click="deleteTimer()"> <md-icon> delete </md-icon> </md-button>
-							<md-button style="margin: 1px;" ng-if="formtimer.index !== undefined" ng-click="formtimer.disabled=!formtimer.disabled">
-								<md-icon> {{formtimer.disabled ? "alarm_off" : "alarm_on"}} </md-icon>
+							<md-button style="margin: 1px;" ng-if="formalarm.index !== undefined" ng-click="deleteAlarm()"> <md-icon> delete </md-icon> </md-button>
+							<md-button style="margin: 1px;" ng-if="formalarm.index !== undefined" ng-click="formalarm.disabled=!formalarm.disabled">
+								<md-icon> {{formalarm.disabled ? "alarm_off" : "alarm_on"}} </md-icon>
 							</md-button>
-							<span ng-if="formtimer.index === undefined" style="width: 40px;"></span> <span ng-if="formtimer.index === undefined" style="width: 40px;"></span>
-							${config.solarEventsEnabled ? `<md-button style="margin: 1px;" aria-label="suntimer" ng-click="showSunSettings=!showSunSettings"> <md-icon> wb_sunny </md-icon> </md-button>` : ``}
+							<span ng-if="formalarm.index === undefined" style="width: 40px;"></span> <span ng-if="formalarm.index === undefined" style="width: 40px;"></span>
+							${config.solarEventsEnabled ? `<md-button style="margin: 1px;" aria-label="sunalarm" ng-click="showSunSettings=!showSunSettings"> <md-icon> wb_sunny </md-icon> </md-button>` : ``}
 							<md-button style="margin: 1px" type="submit"> <md-icon> done </md-icon> </md-button>
 						</div>
 					</div>
@@ -207,7 +207,7 @@ module.exports = function(RED) {
 						<div layout="row" style="height: 50px;">
 							<md-input-container flex="60">
 								<label style="color: var(--nr-dashboard-widgetTextColor)">Alarm type</label>
-								<md-select class="nr-dashboard-dropdown" ng-model="formtimer.alarmtype" ng-change="updateSolarLabels()">
+								<md-select class="nr-dashboard-dropdown" ng-model="formalarm.alarmtype" ng-change="updateSolarLabels()">
 									<md-option value="custom" selected> ${RED._("alarm-clock.ui.custom")} </md-option>
 									<md-option value="sunrise"> ${RED._("alarm-clock.ui.sunrise")} </md-option>
 									<md-option value="sunriseEnd"> ${RED._("alarm-clock.ui.sunriseEnd")} </md-option>
@@ -225,15 +225,15 @@ module.exports = function(RED) {
 									<md-option value="dawn"> ${RED._("alarm-clock.ui.dawn")} </md-option>
 								</md-select>
 							</md-input-container>
-							<md-input-container flex="40" ng-if="formtimer.alarmtype!='custom'">
+							<md-input-container flex="40" ng-if="formalarm.alarmtype!='custom'">
 								<label style="color: var(--nr-dashboard-widgetTextColor)">Offset (min)</label>
-								<input type="number" ng-model="formtimer.alarmOffset" ng-change="offsetValidation()">
+								<input type="number" ng-model="formalarm.alarmOffset" ng-change="offsetValidation()">
 							</md-input-container>
 						</div>
 						<div layout="row" style="height: 50px;">
 						</div>
 						<div layout="row" layout-align="space-between end" style="height: 50px;">
-							<md-button style="margin: 1px;" aria-label="suntimer" ng-click="showSunSettings=!showSunSettings"> <md-icon> arrow_back </md-icon> </md-button>
+							<md-button style="margin: 1px;" aria-label="sunalarm" ng-click="showSunSettings=!showSunSettings"> <md-icon> arrow_back </md-icon> </md-button>
 						</div>
 					</div>
 				</form>
@@ -244,7 +244,7 @@ module.exports = function(RED) {
 		</div>
 		`;
 
-		return String.raw`${styles}${timerBody}`;
+		return String.raw`${styles}${alarmBody}`;
 	}
 
 	function isCOnfigValid(config, node) {
@@ -312,10 +312,10 @@ module.exports = function(RED) {
 						try {
 							const parsedInput = JSON.parse(value);
 
-							const parsedTimers = parsedInput.timers;
-							if (validateTimers(parsedTimers)) {
+							const parsedAlarms = parsedInput.alarms;
+							if (validateAlarms(parsedAlarms)) {
 								node.status({ fill: "green", shape: "dot", text: "alarm-clock.payloadReceived" });
-								setTimers(parsedTimers.filter(timer => timer.output < config.alarms.length));
+								setAlarams(parsedAlarms.filter(alarm => alarm.output < config.alarms.length));
 							} else {
 								node.status({ fill: "yellow", shape: "dot", text: "alarm-clock.invalidPayload" });
 							}
@@ -331,7 +331,7 @@ module.exports = function(RED) {
 				beforeSend: function(msg, orig) {
 					node.status({});
 					if (orig && orig.msg[0]) {
-						setTimers(orig.msg[0].payload.timers);
+						setAlarams(orig.msg[0].payload.alarms);
 						setSettings(orig.msg[0].payload.settings);
 						const sendMsg = JSON.parse(JSON.stringify(orig.msg));
 						sendMsg[0].payload = serializeData();
@@ -349,7 +349,7 @@ module.exports = function(RED) {
 					}
 
 					$scope.$watch('msg', function() {
-						$scope.getTimersFromServer();
+						$scope.getAlarmsFromServer();
 					});
 
 					$scope.toggleViews = function() {
@@ -358,22 +358,22 @@ module.exports = function(RED) {
 
 					$scope.showStandardView = function() {
 						$scope.isEditMode = false;
-						$scope.getElement("timersView").style.display = "block";
+						$scope.getElement("alarmsView").style.display = "block";
 						$scope.getElement("messageBoard").style.display = "none";
 						$scope.getElement("overview").style.display = "none";
-						$scope.getElement("addTimerView").style.display = "none";
+						$scope.getElement("addAlarmView").style.display = "none";
 
-						if (!$scope.timers) {
-							$scope.getElement("timersView").style.display = "none";
+						if (!$scope.alarms) {
+							$scope.getElement("alarmsView").style.display = "none";
 
 							const msgBoard = $scope.getElement("messageBoard");
 							msgBoard.style.display = "block";
 							msgBoard.firstElementChild.innerHTML = $scope.i18n.payloadWarning;
 						} else if ($scope.myAlarmSelect === "overview") {
-							$scope.getElement("timersView").style.display = "none";
+							$scope.getElement("alarmsView").style.display = "none";
 							$scope.getElement("overview").style.display = "block";
-						} else if ($scope.timers.filter(timer => timer.output === $scope.myAlarmSelect).length === 0) {
-							$scope.getElement("timersView").style.display = "none";
+						} else if ($scope.alarms.filter(alarm => alarm.output === $scope.myAlarmSelect).length === 0) {
+							$scope.getElement("alarmsView").style.display = "none";
 
 							const msgBoard = $scope.getElement("messageBoard");
 							msgBoard.style.display = "block";
@@ -381,79 +381,79 @@ module.exports = function(RED) {
 						}
 					}
 
-					$scope.showAddView = function(timerIndex) {
+					$scope.showAddView = function(alarmIndex) {
 						$scope.isEditMode = true;
 						$scope.showSunSettings = false;
-						$scope.getElement("timersView").style.display = "none";
+						$scope.getElement("alarmsView").style.display = "none";
 						$scope.getElement("messageBoard").style.display = "none";
-						$scope.getElement("addTimerView").style.display = "block";
-						$scope.formtimer = { index: timerIndex };
-						$scope.formtimer.dayselect = [];
-						$scope.formtimer.alarmtype = "custom";
+						$scope.getElement("addAlarmView").style.display = "block";
+						$scope.formalarm = { index: alarmIndex };
+						$scope.formalarm.dayselect = [];
+						$scope.formalarm.alarmtype = "custom";
 
-						if (timerIndex === undefined) {
+						if (alarmIndex === undefined) {
 							const today = new Date();
 							if (today.getHours() === 23 && today.getMinutes() >= 54) today.setMinutes(53);
 							const alarm = new Date(today.getFullYear(), today.getMonth(), today.getDay(), today.getHours(), today.getMinutes() + 1, 0);
-							$scope.getElement("timerAlarmTime").value = $scope.formatTime(alarm.getHours(), alarm.getMinutes());
-							$scope.formtimer.dayselect.push(today.getDay());
-							$scope.formtimer.disabled = false;
+							$scope.getElement("alarmTime").value = $scope.formatTime(alarm.getHours(), alarm.getMinutes());
+							$scope.formalarm.dayselect.push(today.getDay());
+							$scope.formalarm.disabled = false;
 						} else {
-							const timer = $scope.timers[timerIndex];
-							if (timer.hasOwnProperty("alarmSolarEvent")) $scope.formtimer.alarmtype = timer.alarmSolarEvent;
-							if (timer.hasOwnProperty("alarmSolarOffset")) $scope.formtimer.alarmOffset = timer.alarmSolarOffset;
+							const alarm = $scope.alarms[alarmIndex];
+							if (alarm.hasOwnProperty("alarmSolarEvent")) $scope.formalarm.alarmtype = alarm.alarmSolarEvent;
+							if (alarm.hasOwnProperty("alarmSolarOffset")) $scope.formalarm.alarmOffset = alarm.alarmSolarOffset;
 							$scope.updateSolarLabels();
-							const alarm = new Date(timer.alarmtime);
-							$scope.getElement("timerAlarmTime").value = $scope.formatTime(alarm.getHours(), alarm.getMinutes());
-							for (let i = 0; i < timer.days.length; i++) {
-								if (timer.days[$scope.localDayToUtc(timer, i)]) $scope.formtimer.dayselect.push(i);
+							const time = new Date(alarm.alarmtime);
+							$scope.getElement("alarmTime").value = $scope.formatTime(time.getHours(), time.getMinutes());
+							for (let i = 0; i < alarm.days.length; i++) {
+								if (alarm.days[$scope.localDayToUtc(alarm, i)]) $scope.formalarm.dayselect.push(i);
 							}
-							$scope.formtimer.disabled = timer.hasOwnProperty("disabled");
+							$scope.formalarm.disabled = alarm.hasOwnProperty("disabled");
 						}
 					}
 
-					$scope.addTimer = function() {
+					$scope.addAlarm = function() {
 						const now = new Date();
-						const alarmInput = $scope.getElement("timerAlarmTime").value.split(":");
+						const alarmInput = $scope.getElement("alarmTime").value.split(":");
 						const alarmtime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), alarmInput[0], alarmInput[1], 0, 0).getTime();
 
-						const timer = {
+						const alarm = {
 							alarmtime: alarmtime,
 							days: [0, 0, 0, 0, 0, 0, 0],
 							output: $scope.myAlarmSelect
 						};
 
-						if ($scope.formtimer.alarmtype !== "custom") {
-							timer.alarmSolarEvent = $scope.formtimer.alarmtype;
-							timer.alarmSolarOffset = $scope.formtimer.alarmOffset;
+						if ($scope.formalarm.alarmtype !== "custom") {
+							alarm.alarmSolarEvent = $scope.formalarm.alarmtype;
+							alarm.alarmSolarOffset = $scope.formalarm.alarmOffset;
 						}
 
-						$scope.formtimer.dayselect.forEach(day => {
-							const utcDay = $scope.localDayToUtc(timer, Number(day));
-							timer.days[utcDay] = 1;
+						$scope.formalarm.dayselect.forEach(day => {
+							const utcDay = $scope.localDayToUtc(alarm, Number(day));
+							alarm.days[utcDay] = 1;
 						});
 
-						if ($scope.formtimer.disabled) timer.disabled = "disabled";
+						if ($scope.formalarm.disabled) alarm.disabled = "disabled";
 
-						const timerIndex = $scope.formtimer.index;
-						if (timerIndex === undefined) {
-							$scope.timers.push(timer);
+						const alarmIndex = $scope.formalarm.index;
+						if (alarmIndex === undefined) {
+							$scope.alarms.push(alarm);
 						} else {
-							$scope.timers.splice(timerIndex, 1, timer);
+							$scope.alarms.splice(alarmIndex, 1, alarm);
 						}
 
-						$scope.sendTimersToOutput();
+						$scope.sendAlarmsToOutput();
 					}
 
-					$scope.deleteTimer = function() {
-						$scope.timers.splice($scope.formtimer.index, 1);
-						$scope.sendTimersToOutput();
+					$scope.deleteAlarm = function() {
+						$scope.alarms.splice($scope.formalarm.index, 1);
+						$scope.sendAlarmsToOutput();
 					}
 
-					$scope.sendTimersToOutput = function() {
+					$scope.sendAlarmsToOutput = function() {
 						if (!$scope.msg) $scope.msg = [{ payload: "" }];
 						$scope.msg[0].payload = {
-							timers: angular.copy($scope.timers),
+							alarms: angular.copy($scope.alarms),
 							settings: {
 								disabledAlarms: angular.copy($scope.disabledAlarms),
 								overviewFilter: angular.copy($scope.overviewFilter)
@@ -463,10 +463,10 @@ module.exports = function(RED) {
 					}
 
 					$scope.daysChanged = function() {
-						if ($scope.formtimer.dayselect.length === 8) {
-							$scope.formtimer.dayselect = [];
-						} else if ($scope.formtimer.dayselect.includes('all')) {
-							$scope.formtimer.dayselect = [0, 1, 2, 3, 4, 5, 6];
+						if ($scope.formalarm.dayselect.length === 8) {
+							$scope.formalarm.dayselect = [];
+						} else if ($scope.formalarm.dayselect.includes('all')) {
+							$scope.formalarm.dayselect = [0, 1, 2, 3, 4, 5, 6];
 						};
 					}
 
@@ -484,20 +484,20 @@ module.exports = function(RED) {
 					}
 
 					$scope.updateSolarLabels = function() {
-						const alarmOffset = $scope.formtimer.alarmOffset > 0 ? "+" + $scope.formtimer.alarmOffset : ($scope.formtimer.alarmOffset || 0);
-						const alarmTypeLabel = alarmOffset === 0 ? $scope.i18n[$scope.formtimer.alarmtype] : $scope.i18n[$scope.formtimer.alarmtype].substr(0, 8);
-						$scope.formtimer.solarAlarmTimeLabel = alarmTypeLabel + (alarmOffset != 0 ? " " + alarmOffset + "m" : "");
+						const alarmOffset = $scope.formalarm.alarmOffset > 0 ? "+" + $scope.formalarm.alarmOffset : ($scope.formalarm.alarmOffset || 0);
+						const alarmTypeLabel = alarmOffset === 0 ? $scope.i18n[$scope.formalarm.alarmtype] : $scope.i18n[$scope.formalarm.alarmtype].substr(0, 8);
+						$scope.formalarm.solarAlarmTimeLabel = alarmTypeLabel + (alarmOffset != 0 ? " " + alarmOffset + "m" : "");
 					}
 
 					$scope.offsetValidation = function() {
-						if ($scope.formtimer.alarmOffset > 300) $scope.formtimer.alarmOffset = 300;
-						if ($scope.formtimer.alarmOffset < -300) $scope.formtimer.alarmOffset = -300;
+						if ($scope.formalarm.alarmOffset > 300) $scope.formalarm.alarmOffset = 300;
+						if ($scope.formalarm.alarmOffset < -300) $scope.formalarm.alarmOffset = -300;
 						$scope.updateSolarLabels();
 					}
 
-					$scope.localDayToUtc = function(timer, localDay) {
-						const alarm = new Date(timer.alarmtime);
-						let shift = alarm.getUTCDay() - alarm.getDay();
+					$scope.localDayToUtc = function(alarm, localDay) {
+						const time = new Date(alarm.alarmtime);
+						let shift = time.getUTCDay() - time.getDay();
 						if (shift < -1) shift = 1;
 						if (shift > 1) shift = -1;
 						let utcDay = shift + localDay;
@@ -516,12 +516,12 @@ module.exports = function(RED) {
 
 					$scope.changeFilter = function(filter) {
 						$scope.overviewFilter = filter;
-						$scope.sendTimersToOutput();
+						$scope.sendAlarmsToOutput();
 					}
 
-					$scope.getTimersByOverviewFilter = function() {
-						if ($scope.overviewFilter === 'all') return $scope.timers;
-						return $scope.timers ? $scope.timers.filter(t => !t.disabled && $scope.isAlarmEnabled(t.output)) : [];
+					$scope.getAlarmsByOverviewFilter = function() {
+						if ($scope.overviewFilter === 'all') return $scope.alarms;
+						return $scope.alarms ? $scope.alarms.filter(alarm => !alarm.disabled && $scope.isAlarmEnabled(alarm.output)) : [];
 					}
 
 					$scope.toggleAlarmStatus = function(alarmIndex) {
@@ -531,7 +531,7 @@ module.exports = function(RED) {
 						} else {
 							$scope.disabledAlarms.splice($scope.disabledAlarms.indexOf(alarmIndex), 1);
 						}
-						$scope.sendTimersToOutput();
+						$scope.sendAlarmsToOutput();
 					}
 
 					$scope.isAlarmEnabled = function(alarmIndex) {
@@ -539,14 +539,14 @@ module.exports = function(RED) {
 						return !disabledAlarms.includes(alarmIndex.toString());
 					}
 
-					$scope.getTimersFromServer = function() {
+					$scope.getAlarmsFromServer = function() {
 						$.ajax({
 							url: "alarm-clock/getNode/" + $scope.nodeId, dataType: 'json',
 							beforeSend: function() {
 								$scope.loading = true;
 							},
 							success: function(json) {
-								$scope.timers = json.timers;
+								$scope.alarms = json.alarms;
 								$scope.disabledAlarms = json.settings.disabledAlarms;
 								$scope.overviewFilter = json.settings.overviewFilter;
 								$scope.$digest();
@@ -565,24 +565,24 @@ module.exports = function(RED) {
 			let prevMsg = [];
 
 			(() => {
-				let timers = getContextValue('timers');
-				if (validateTimers(timers)) {
+				let alarms = getContextValue('alarms');
+				if (validateAlarms(alarms)) {
 					node.status({});
-					timers = timers.filter(timer => timer.output < config.alarms.length);
+					alarms = alarms.filter(alarm => alarm.output < config.alarms.length);
 				} else {
 					node.status({ fill: "green", shape: "dot", text: "alarm-clock.contextCreated" });
-					timers = [];
+					alarms = [];
 				}
-				setTimers(timers);
+				setAlarams(alarms);
 				createInitTimeout();
 			})();
 
-			function validateTimers(timers) {
-				return Array.isArray(timers) && timers.every(element => {
-					if ((!element.hasOwnProperty("alarmtime") || !element.hasOwnProperty("days")) || element.hasOwnProperty("event")) return false;
+			function validateAlarms(alarms) {
+				return Array.isArray(alarms) && alarms.every(alarm => {
+					if ((!alarm.hasOwnProperty("alarmtime") || !alarm.hasOwnProperty("days")) || alarm.hasOwnProperty("event")) return false;
 
-					if (!element.hasOwnProperty("output")) element.output = "0";
-					else if (Number.isInteger(element.output)) element.output = element.output.toString();
+					if (!alarm.hasOwnProperty("output")) alarm.output = "0";
+					else if (Number.isInteger(alarm.output)) alarm.output = alarm.output.toString();
 
 					return true;
 				});
@@ -598,17 +598,17 @@ module.exports = function(RED) {
 					node.context().set(key, value, config.customContextStore) : node.context().set(key, value);
 			}
 
-			function getTimers() {
-				const timers = getContextValue('timers') || [];
-				return updateSolarEvents(timers).sort(function(a, b) {
+			function getAlarms() {
+				const alarms = getContextValue('alarms') || [];
+				return updateSolarEvents(alarms).sort(function(a, b) {
 					const millisA = getNowWithCustomTime(a.alarmtime);
 					const millisB = getNowWithCustomTime(b.alarmtime);
 					return millisA - millisB;
 				});
 			}
 
-			function setTimers(timers) {
-				setContextValue('timers', timers);
+			function setAlarams(alarms) {
+				setContextValue('alarms', alarms);
 			}
 
 			function getSettings() {
@@ -653,12 +653,12 @@ module.exports = function(RED) {
 				const today = new Date();
 				const remaining = config.refresh - (today.getSeconds() % config.refresh);
 				setTimeout(function() {
-					nodeInterval = setInterval(intervalTimerFunction, config.refresh * 1000);
-					intervalTimerFunction();
+					nodeInterval = setInterval(onInterval, config.refresh * 1000);
+					onInterval();
 				}, (remaining * 1000) - today.getMilliseconds());
 			}
 
-			function intervalTimerFunction() {
+			function onInterval() {
 				const outputValues = [null];
 				addOutputValues(outputValues);
 				node.send(outputValues);
@@ -684,20 +684,20 @@ module.exports = function(RED) {
 			}
 
 			function isInTime(alarmIndex) {
-				const nodeTimers = getTimers();
+				const nodeAlarms = getAlarms();
 				let status = false;
 
-				if (nodeTimers.length > 0 && !getDisabledAlarms().includes(alarmIndex.toString())) {
+				if (nodeAlarms.length > 0 && !getDisabledAlarms().includes(alarmIndex.toString())) {
 					const date = new Date();
 
-					nodeTimers.filter(timer => timer.output === alarmIndex).forEach(function(timer) {
+					nodeAlarms.filter(alarm => alarm.output === alarmIndex).forEach(function(alarm) {
 						if (status !== status) return;
-						if (timer.hasOwnProperty("disabled")) return;
+						if (alarm.hasOwnProperty("disabled")) return;
 
-						const utcDay = localDayToUtc(timer, date.getDay());
-						const localAlarmTime = new Date(timer.alarmtime);
+						const utcDay = localDayToUtc(alarm, date.getDay());
+						const localAlarmTime = new Date(alarm.alarmtime);
 
-						if (timer.days[utcDay] === 0) return;
+						if (alarm.days[utcDay] === 0) return;
 
 						const compareDate = new Date(localAlarmTime);
 						compareDate.setHours(date.getHours());
@@ -712,9 +712,9 @@ module.exports = function(RED) {
 				return status;
 			}
 
-			function localDayToUtc(timer, localDay) {
-				const alarm = new Date(timer.alarmtime);
-				let shift = alarm.getUTCDay() - alarm.getDay();
+			function localDayToUtc(alarm, localDay) {
+				const time = new Date(alarm.alarmtime);
+				let shift = time.getUTCDay() - time.getDay();
 				if (shift < -1) shift = 1;
 				if (shift > 1) shift = -1;
 				let utcDay = shift + localDay;
@@ -732,24 +732,24 @@ module.exports = function(RED) {
 				return date.getTime();
 			}
 
-			function updateSolarEvents(timers) {
+			function updateSolarEvents(alarms) {
 				if (config.solarEventsEnabled) {
 					const sunTimes = sunCalc.getTimes(new Date(), config.lat, config.lon);
-					return timers.map(t => {
-						if (t.hasOwnProperty("alarmSolarEvent")) {
-							const offset = t.alarmSolarOffset || 0;
-							const solarTime = sunTimes[t.alarmSolarEvent];
-							t.alarmtime = solarTime.getTime() + (offset * 60 * 1000);
+					return alarms.map(alarm => {
+						if (alarm.hasOwnProperty("alarmSolarEvent")) {
+							const offset = alarm.alarmSolarOffset || 0;
+							const solarTime = sunTimes[alarm.alarmSolarEvent];
+							alarm.alarmtime = solarTime.getTime() + (offset * 60 * 1000);
 						}
-						return t;
+						return alarm;
 					});
 				} else {
-					return timers.filter(t => !t.hasOwnProperty("alarmSolarEvent"));
+					return alarms.filter(alarm => !alarm.hasOwnProperty("alarmSolarEvent"));
 				}
 			}
 
 			function getNodeData() {
-				return { timers: getTimers(), settings: getSettings() };
+				return { alarm: getAlarms(), settings: getSettings() };
 			}
 
 			function serializeData() {

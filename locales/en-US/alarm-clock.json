@@ -61,7 +61,7 @@
             "payloadWarning": "Invalid or no payload provided.",
             "emptyOverview": "Nothing planned yet. Click \"Overview\" and select an alarm.",
             "noActiveOverview": "No schedules are active. Click \"Overview\" and select an alarm.",
-            "nothingPlanned": "Nothing planned yet. Click the plus sign to add a new timer.",
+            "nothingPlanned": "Nothing planned yet. Click the plus sign to add a new alarm.",
             "selectAll": "Select All"
         }
     }
