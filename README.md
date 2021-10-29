@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/node-red-contrib-ui-alarm-clock.svg)](https://badge.fury.io/js/node-red-contrib-ui-alarm-clock)
+
 # node-red-contrib-ui-alarm-clock
 A node-red-ui alarm clock for the Node-RED Dashboard.  
 
