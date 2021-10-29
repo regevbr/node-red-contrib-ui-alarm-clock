@@ -1,7 +1,7 @@
 {
-  "name": "node-red-contrib-ui-time-scheduler",
-  "version": "1.16.1",
-  "description": "A ui time scheduler for the Node-RED Dashboard",
+  "name": "node-red-contrib-ui-alarm-clock",
+  "version": "0.0.1",
+  "description": "A ui alarm clock for the Node-RED Dashboard",
   "dependencies": {
     "suncalc": "^1.8.0"
   },
@@ -9,24 +9,24 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Mario Fellinger <mario.fellinger@outlook.com>",
+  "author": "Regev Brody <regevbr@gmail.com>",
   "license": "MIT",
   "node-red": {
     "nodes": {
-      "time_scheduler": "time-scheduler.js"
+      "alarm_clock": "alarm-clock.js"
     }
   },
   "keywords": [
     "node-red",
-    "time-scheduler",
-    "schedules",
-    "timer",
+    "alarm-clock",
+    "alarm",
+    "clock",
     "dashboard",
     "frontend",
     "iot"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/fellinga/node-red-contrib-ui-time-scheduler.git"
+    "url": "https://github.com/regevbr/node-red-contrib-ui-alarm-clock.git"
   }
 }
