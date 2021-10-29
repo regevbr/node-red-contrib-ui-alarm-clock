@@ -686,11 +686,11 @@ module.exports = function(RED) {
 			function isInTime(alarmIndex) {
 				const nodeAlarms = getAlarms();
 				let status = false;
-
-				if (nodeAlarms.length > 0 && !getDisabledAlarms().includes(alarmIndex.toString())) {
+				let stringIndex = alarmIndex.toString();
+				if (nodeAlarms.length > 0 && !getDisabledAlarms().includes(stringIndex)) {
 					const date = new Date();
 
-					nodeAlarms.filter(alarm => alarm.output === alarmIndex).forEach(function(alarm) {
+					nodeAlarms.filter(alarm => alarm.output === stringIndex).forEach(function(alarm) {
 						if (status !== status) return;
 						if (alarm.hasOwnProperty("disabled")) return;
 
@@ -712,14 +712,16 @@ module.exports = function(RED) {
 			}
 
 			function getNextAlarmTime(alarmIndex) {
-				if (getDisabledAlarms().includes(alarmIndex.toString())) {
+				let stringIndex = alarmIndex.toString();
+
+				if (getDisabledAlarms().includes(stringIndex)) {
 					return null;
 				}
 
 				const alarms = JSON.parse(
 					JSON.stringify(
 						(getContextValue('alarms') || [])
-										.filter(alarm => alarm.output === alarmIndex)
+										.filter(alarm => alarm.output === stringIndex)
 										.filter(alarm => !alarm.disabled)
 					)
 				);
@@ -732,7 +734,7 @@ module.exports = function(RED) {
 
 				const nowTime = new Date().getTime();
 
-				for (let offset = 0; offset < 7; offset++) {
+				for (let offset = 0; offset < 8; offset++) {
 					if (nextAlarm) break;
 					const currentDate = new Date(nowTime + (offset * 24 * 60 * 60 * 1000));
 					const currentAlarms = updateSolarEvents(alarms, currentDate);
