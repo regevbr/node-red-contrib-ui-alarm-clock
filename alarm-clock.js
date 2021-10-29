@@ -315,7 +315,7 @@ module.exports = function(RED) {
 							const parsedAlarms = parsedInput.alarms;
 							if (validateAlarms(parsedAlarms)) {
 								node.status({ fill: "green", shape: "dot", text: "alarm-clock.payloadReceived" });
-								setAlarams(parsedAlarms.filter(alarm => alarm.output < config.alarm_names.length));
+								setAlarms(parsedAlarms.filter(alarm => alarm.output < config.alarm_names.length));
 							} else {
 								node.status({ fill: "yellow", shape: "dot", text: "alarm-clock.invalidPayload" });
 							}
@@ -331,7 +331,7 @@ module.exports = function(RED) {
 				beforeSend: function(msg, orig) {
 					node.status({});
 					if (orig && orig.msg[0]) {
-						setAlarams(orig.msg[0].payload.alarms);
+						setAlarms(orig.msg[0].payload.alarms);
 						setSettings(orig.msg[0].payload.settings);
 						const sendMsg = JSON.parse(JSON.stringify(orig.msg));
 						sendMsg[0].payload = serializeData();
@@ -573,7 +573,7 @@ module.exports = function(RED) {
 					node.status({ fill: "green", shape: "dot", text: "alarm-clock.contextCreated" });
 					alarms = [];
 				}
-				setAlarams(alarms);
+				setAlarms(alarms);
 				createInitTimeout();
 			})();
 
@@ -607,7 +607,7 @@ module.exports = function(RED) {
 				});
 			}
 
-			function setAlarams(alarms) {
+			function setAlarms(alarms) {
 				setContextValue('alarms', alarms);
 			}
 
@@ -695,10 +695,9 @@ module.exports = function(RED) {
 						if (alarm.hasOwnProperty("disabled")) return;
 
 						const utcDay = localDayToUtc(alarm, date.getDay());
-						const localAlarmTime = new Date(alarm.alarmtime);
-
 						if (alarm.days[utcDay] === 0) return;
 
+						const localAlarmTime = new Date(alarm.alarmtime);
 						const compareDate = new Date(localAlarmTime);
 						compareDate.setHours(date.getHours());
 						compareDate.setMinutes(date.getMinutes());
@@ -710,6 +709,47 @@ module.exports = function(RED) {
 				}
 
 				return status;
+			}
+
+			function getNextAlarmTime(alarmIndex) {
+				if (getDisabledAlarms().includes(alarmIndex.toString())) {
+					return null;
+				}
+
+				const alarms = JSON.parse(
+					JSON.stringify(
+						(getContextValue('alarms') || [])
+										.filter(alarm => alarm.output === alarmIndex)
+										.filter(alarm => !alarm.disabled)
+					)
+				);
+
+				if (alarms.length === 0) {
+					return null;
+				}
+
+				let nextAlarm = null;
+
+				const nowTime = new Date().getTime();
+
+				for (let offset = 0; offset < 7; offset++) {
+					if (nextAlarm) break;
+					const currentDate = new Date(nowTime + (offset * 24 * 60 * 60 * 1000));
+					const currentAlarms = updateSolarEvents(alarms, currentDate);
+					currentAlarms.forEach((alarm) => {
+						const utcDay = localDayToUtc(alarm, currentDate.getDay());
+						if (alarm.days[utcDay] === 0) return;
+
+						const localAlarmTime = new Date(alarm.alarmtime);
+
+						const compareDate = new Date(currentDate);
+						compareDate.setHours(localAlarmTime.getHours());
+						compareDate.setMinutes(localAlarmTime.getMinutes());
+						const compareTime = compareDate.getTime();
+						if (compareTime > nowTime && (!nextAlarm || compareTime < nextAlarm)) nextAlarm = compareTime;
+					});
+				}
+				return nextAlarm;
 			}
 
 			function localDayToUtc(alarm, localDay) {
@@ -732,9 +772,9 @@ module.exports = function(RED) {
 				return date.getTime();
 			}
 
-			function updateSolarEvents(alarms) {
+			function updateSolarEvents(alarms, fromDate) {
 				if (config.solarEventsEnabled) {
-					const sunTimes = sunCalc.getTimes(new Date(), config.lat, config.lon);
+					const sunTimes = sunCalc.getTimes(fromDate || new Date(), config.lat, config.lon);
 					return alarms.map(alarm => {
 						if (alarm.hasOwnProperty("alarmSolarEvent")) {
 							const offset = alarm.alarmSolarOffset || 0;
@@ -748,8 +788,19 @@ module.exports = function(RED) {
 				}
 			}
 
+			function getUpcomingAlarms() {
+				const upcoming = {};
+				for (let alarm = 0; alarm < config.alarm_names.length; alarm++) {
+					const next = getNextAlarmTime(alarm);
+					if (next) {
+						upcoming[config.alarm_names[alarm]] = next;
+					}
+				}
+				return upcoming;
+			}
+
 			function getNodeData() {
-				return { alarms: getAlarms(), settings: getSettings() };
+				return { alarms: getAlarms(), settings: getSettings(), upcoming: getUpcomingAlarms() };
 			}
 
 			function serializeData() {
