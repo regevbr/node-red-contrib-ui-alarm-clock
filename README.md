@@ -17,7 +17,7 @@ node-red-dashboard v2.10.0 (v2.15.4 or above would be ideal)
   
 ## Usage
   
-Add a alarm-clock-node to your flow. Open the dashboard, you will see an empty scheduler.
+Add a alarm-clock-node to your flow. Open the dashboard, you will see an empty list.
 Click the plus sign at the top right corner of the node to create a new timer.
   
 ### Input

@@ -88,7 +88,7 @@ module.exports = function(RED) {
 				<span flex="65" ng-show="devices.length > 1">
 					<md-input-container>
 						<md-select class="nr-dashboard-dropdown" ng-model="myDeviceSelect" ng-change="showStandardView()" aria-label="Select device" ng-disabled="isEditMode">
-							<md-option value="overview"> ${RED._("time-scheduler.ui.overview")} </md-option>
+							<md-option value="overview"> ${RED._("alarm-clock.ui.overview")} </md-option>
 							<md-option ng-repeat="device in devices" value={{$index}}> {{devices[$index]}} </md-option>
 						</md-select>
 					</md-input-container>
@@ -106,10 +106,10 @@ module.exports = function(RED) {
 						</md-fab-trigger>
 						<md-fab-actions style="width: 84px;">
 							<md-button aria-label="enabled" style="width: 100%; margin: 7px 0 0 0; border: 2px solid var(--nr-dashboard-groupBorderColor);" ng-click="changeFilter('enabled')" ng-disabled="overviewFilter != 'all'">
-								${RED._("time-scheduler.ui.active")} <md-icon> {{overviewFilter === "all" ? "" : "check"}} </md-icon> 
+								${RED._("alarm-clock.ui.active")} <md-icon> {{overviewFilter === "all" ? "" : "check"}} </md-icon> 
 							</md-button>
 							<md-button aria-label="all" style="width: 100%; margin: 7px 0 0 0; border: 2px solid var(--nr-dashboard-groupBorderColor);" ng-click="changeFilter('all')" ng-disabled="overviewFilter == 'all'">
-								${RED._("time-scheduler.ui.all")} <md-icon> {{overviewFilter === "all" ? "check" : ""}} </md-icon> 
+								${RED._("alarm-clock.ui.all")} <md-icon> {{overviewFilter === "all" ? "check" : ""}} </md-icon> 
 							</md-button>
 						</md-fab-actions>
 					</md-fab-speed-dial>
@@ -133,10 +133,10 @@ module.exports = function(RED) {
 					<md-list>
 				</div>
 				<div ng-if="timers.length == 0">
-					<p> ${RED._("time-scheduler.ui.emptyOverview")} <p>
+					<p> ${RED._("alarm-clock.ui.emptyOverview")} <p>
 				</div>
 				<div ng-if="timers.length != 0 && getTimersByOverviewFilter().length == 0">
-					<p> ${RED._("time-scheduler.ui.noActiveOverview")} <p>
+					<p> ${RED._("alarm-clock.ui.noActiveOverview")} <p>
 				</div>
 			</div>
 			<div id="timersView-${uniqueId}">
@@ -145,12 +145,12 @@ module.exports = function(RED) {
 						<div layout="row" class="md-subhead">
 							<span flex=""> # </span>
 							${config.eventMode ? `
-							<span flex="40"> ${RED._("time-scheduler.ui.start")} </span>
-							<span flex="45"> ${RED._("time-scheduler.ui.event")} </span>
+							<span flex="40"> ${RED._("alarm-clock.ui.start")} </span>
+							<span flex="45"> ${RED._("alarm-clock.ui.event")} </span>
 							` : `
-							<span flex="30"> ${RED._("time-scheduler.ui.start")} </span>
-							<span flex="30"> ${RED._("time-scheduler.ui.end")} </span>
-							<span flex="25"> ${RED._("time-scheduler.ui.duration")} </span>
+							<span flex="30"> ${RED._("alarm-clock.ui.start")} </span>
+							<span flex="30"> ${RED._("alarm-clock.ui.end")} </span>
+							<span flex="25"> ${RED._("alarm-clock.ui.duration")} </span>
 							`}
 						</div>
 					</md-subheader>
@@ -185,18 +185,18 @@ module.exports = function(RED) {
 					<div ng-show="!showSunSettings">
 						<div layout="row" layout-align="space-between none" style="max-height: 60px;">
 							<md-input-container flex="50" ng-show="formtimer.starttype === 'custom'" style="margin-left: 0">
-								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("time-scheduler.ui.starttime")}</label>
+								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.starttime")}</label>
 								<input id="timerStarttime-${uniqueId}" value="08:00" type="time" required pattern="^([0-1][0-9]|2[0-3]):([0-5][0-9])$">
 								<span class="validity"></span>
 							</md-input-container>
 							<md-input-container flex="50" ng-if="formtimer.starttype !== 'custom'" style="margin-left: 0">
-								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("time-scheduler.ui.starttime")}</label>
+								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.starttime")}</label>
 								<input ng-model="formtimer.solarStarttimeLabel" type="text" required disabled>
 								<span class="validity"></span>
 							</md-input-container>
 							${config.eventMode ? `
 							<md-input-container flex="">
-								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("time-scheduler.ui.event")}</label>
+								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.event")}</label>
 								${config.customPayload ? `
 								<input ng-model="formtimer.timerEvent" required autocomplete="off">
 								` : `
@@ -207,12 +207,12 @@ module.exports = function(RED) {
 							</md-input-container>
 							` : `
 							<md-input-container flex="50" ng-show="formtimer.starttype === 'custom'">
-								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("time-scheduler.ui.endtime")}</label>
+								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.endtime")}</label>
 								<input id="timerEndtime-${uniqueId}" value="10:00" type="time" required pattern="^([0-1][0-9]|2[0-3]):([0-5][0-9])$">
 								<span class="validity"></span>
 							</md-input-container>
 							<md-input-container flex="50" ng-if="formtimer.starttype !== 'custom'">
-								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("time-scheduler.ui.endtime")}</label>
+								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.endtime")}</label>
 								<input ng-model="formtimer.solarEndtimeLabel" type="text" required disabled> </input>
 								<span class="validity"></span>
 							</md-input-container>
@@ -220,9 +220,9 @@ module.exports = function(RED) {
 						</div>
 						<div layout="row" style="max-height: 50px;">
 							<md-input-container>
-								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("time-scheduler.ui.daysActive")}</label>
-								<md-select class="nr-dashboard-dropdown" multiple="true" placeholder="${RED._("time-scheduler.ui.daysActive")}" ng-model="formtimer.dayselect" ng-change="daysChanged()" >
-									<md-option value="all"><em>${RED._("time-scheduler.ui.selectAll")}</em></md-option>
+								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.daysActive")}</label>
+								<md-select class="nr-dashboard-dropdown" multiple="true" placeholder="${RED._("alarm-clock.ui.daysActive")}" ng-model="formtimer.dayselect" ng-change="daysChanged()" >
+									<md-option value="all"><em>${RED._("alarm-clock.ui.selectAll")}</em></md-option>
 									<md-option ng-repeat="day in days | limitTo : ${config.startDay}-7" ng-init="$index=$index+${config.startDay}" value={{$index}}> {{days[$index]}} </md-option>
 									<md-option ng-repeat="day in days | limitTo : -${config.startDay}" value={{$index}}> {{days[$index]}} </md-option>
 								</md-select>
@@ -243,21 +243,21 @@ module.exports = function(RED) {
 							<md-input-container flex="60">
 								<label style="color: var(--nr-dashboard-widgetTextColor)">Starttype</label>
 								<md-select class="nr-dashboard-dropdown" ng-model="formtimer.starttype" ng-change="updateSolarLabels()">
-									<md-option value="custom" selected> ${RED._("time-scheduler.ui.custom")} </md-option>
-									<md-option value="sunrise"> ${RED._("time-scheduler.ui.sunrise")} </md-option>
-									<md-option value="sunriseEnd"> ${RED._("time-scheduler.ui.sunriseEnd")} </md-option>
-									<md-option value="goldenHourEnd"> ${RED._("time-scheduler.ui.goldenHourEnd")} </md-option>
-									<md-option value="solarNoon"> ${RED._("time-scheduler.ui.solarNoon")} </md-option>
-									<md-option value="goldenHour"> ${RED._("time-scheduler.ui.goldenHour")} </md-option>
-									<md-option value="sunsetStart"> ${RED._("time-scheduler.ui.sunsetStart")} </md-option>
-									<md-option value="sunset"> ${RED._("time-scheduler.ui.sunset")} </md-option>
-									<md-option value="dusk"> ${RED._("time-scheduler.ui.dusk")} </md-option>
-									<md-option value="nauticalDusk"> ${RED._("time-scheduler.ui.nauticalDusk")} </md-option>
-									<md-option value="night"> ${RED._("time-scheduler.ui.night")} </md-option>
-									<md-option value="nadir"> ${RED._("time-scheduler.ui.nadir")} </md-option>
-									<md-option value="nightEnd"> ${RED._("time-scheduler.ui.nightEnd")} </md-option>
-									<md-option value="nauticalDawn"> ${RED._("time-scheduler.ui.nauticalDawn")} </md-option>
-									<md-option value="dawn"> ${RED._("time-scheduler.ui.dawn")} </md-option>
+									<md-option value="custom" selected> ${RED._("alarm-clock.ui.custom")} </md-option>
+									<md-option value="sunrise"> ${RED._("alarm-clock.ui.sunrise")} </md-option>
+									<md-option value="sunriseEnd"> ${RED._("alarm-clock.ui.sunriseEnd")} </md-option>
+									<md-option value="goldenHourEnd"> ${RED._("alarm-clock.ui.goldenHourEnd")} </md-option>
+									<md-option value="solarNoon"> ${RED._("alarm-clock.ui.solarNoon")} </md-option>
+									<md-option value="goldenHour"> ${RED._("alarm-clock.ui.goldenHour")} </md-option>
+									<md-option value="sunsetStart"> ${RED._("alarm-clock.ui.sunsetStart")} </md-option>
+									<md-option value="sunset"> ${RED._("alarm-clock.ui.sunset")} </md-option>
+									<md-option value="dusk"> ${RED._("alarm-clock.ui.dusk")} </md-option>
+									<md-option value="nauticalDusk"> ${RED._("alarm-clock.ui.nauticalDusk")} </md-option>
+									<md-option value="night"> ${RED._("alarm-clock.ui.night")} </md-option>
+									<md-option value="nadir"> ${RED._("alarm-clock.ui.nadir")} </md-option>
+									<md-option value="nightEnd"> ${RED._("alarm-clock.ui.nightEnd")} </md-option>
+									<md-option value="nauticalDawn"> ${RED._("alarm-clock.ui.nauticalDawn")} </md-option>
+									<md-option value="dawn"> ${RED._("alarm-clock.ui.dawn")} </md-option>
 								</md-select>
 							</md-input-container>
 							<md-input-container flex="40" ng-if="formtimer.starttype!='custom'">
@@ -269,20 +269,20 @@ module.exports = function(RED) {
 							<md-input-container ng-if="!${config.eventMode} && formtimer.starttype!='custom'">
 								<label style="color: var(--nr-dashboard-widgetTextColor)">Endtype</label>
 								<md-select class="nr-dashboard-dropdown" ng-model="formtimer.endtype" ng-change="updateSolarLabels()">
-									<md-option value="sunrise"> ${RED._("time-scheduler.ui.sunrise")} </md-option>
-									<md-option value="sunriseEnd"> ${RED._("time-scheduler.ui.sunriseEnd")} </md-option>
-									<md-option value="goldenHourEnd"> ${RED._("time-scheduler.ui.goldenHourEnd")} </md-option>
-									<md-option value="solarNoon"> ${RED._("time-scheduler.ui.solarNoon")} </md-option>
-									<md-option value="goldenHour"> ${RED._("time-scheduler.ui.goldenHour")} </md-option>
-									<md-option value="sunsetStart"> ${RED._("time-scheduler.ui.sunsetStart")} </md-option>
-									<md-option value="sunset"> ${RED._("time-scheduler.ui.sunset")} </md-option>
-									<md-option value="dusk"> ${RED._("time-scheduler.ui.dusk")} </md-option>
-									<md-option value="nauticalDusk"> ${RED._("time-scheduler.ui.nauticalDusk")} </md-option>
-									<md-option value="night"> ${RED._("time-scheduler.ui.night")} </md-option>
-									<md-option value="nadir"> ${RED._("time-scheduler.ui.nadir")} </md-option>
-									<md-option value="nightEnd"> ${RED._("time-scheduler.ui.nightEnd")} </md-option>
-									<md-option value="nauticalDawn"> ${RED._("time-scheduler.ui.nauticalDawn")} </md-option>
-									<md-option value="dawn"> ${RED._("time-scheduler.ui.dawn")} </md-option>
+									<md-option value="sunrise"> ${RED._("alarm-clock.ui.sunrise")} </md-option>
+									<md-option value="sunriseEnd"> ${RED._("alarm-clock.ui.sunriseEnd")} </md-option>
+									<md-option value="goldenHourEnd"> ${RED._("alarm-clock.ui.goldenHourEnd")} </md-option>
+									<md-option value="solarNoon"> ${RED._("alarm-clock.ui.solarNoon")} </md-option>
+									<md-option value="goldenHour"> ${RED._("alarm-clock.ui.goldenHour")} </md-option>
+									<md-option value="sunsetStart"> ${RED._("alarm-clock.ui.sunsetStart")} </md-option>
+									<md-option value="sunset"> ${RED._("alarm-clock.ui.sunset")} </md-option>
+									<md-option value="dusk"> ${RED._("alarm-clock.ui.dusk")} </md-option>
+									<md-option value="nauticalDusk"> ${RED._("alarm-clock.ui.nauticalDusk")} </md-option>
+									<md-option value="night"> ${RED._("alarm-clock.ui.night")} </md-option>
+									<md-option value="nadir"> ${RED._("alarm-clock.ui.nadir")} </md-option>
+									<md-option value="nightEnd"> ${RED._("alarm-clock.ui.nightEnd")} </md-option>
+									<md-option value="nauticalDawn"> ${RED._("alarm-clock.ui.nauticalDawn")} </md-option>
+									<md-option value="dawn"> ${RED._("alarm-clock.ui.dawn")} </md-option>
 								</md-select>
 							</md-input-container>
 							<md-input-container flex="40" ng-if="!${config.eventMode} && formtimer.starttype!='custom'">
@@ -307,17 +307,17 @@ module.exports = function(RED) {
 
 	function checkConfig(config, node) {
 		if (!config) {
-			node.error(RED._("ui_time_scheduler.error.no-config"));
+			node.error(RED._("ui_alarm_clock.error.no-config"));
 			return false;
 		}
 		if (!config.hasOwnProperty("group")) {
-			node.error(RED._("ui_time_scheduler.error.no-group"));
+			node.error(RED._("ui_alarm_clock.error.no-group"));
 			return false;
 		}
 		return true;
 	}
 
-	function TimeSchedulerNode(config) {
+	function AlarmClockNode(config) {
 		try {
 			let ui = undefined;
 			if (ui === undefined) {
@@ -331,11 +331,11 @@ module.exports = function(RED) {
 			if (!config.hasOwnProperty("refresh")) config.refresh = 60;
 			if (!config.hasOwnProperty("startDay")) config.startDay = 0;
 			if (!config.hasOwnProperty("height") || config.height == 0) config.height = 1;
-			if (!config.hasOwnProperty("name") || config.name === "") config.name = "Time-Scheduler";
+			if (!config.hasOwnProperty("name") || config.name === "") config.name = "Alarm-Clock";
 			if (!config.hasOwnProperty("devices") || config.devices.length === 0) config.devices = [config.name];
-			if (!config.hasOwnProperty("eventOptions")) config.eventOptions = [{ label: RED._("time-scheduler.label.on"), event: "true" }, { label: RED._("time-scheduler.label.off"), event: "false" }];
+			if (!config.hasOwnProperty("eventOptions")) config.eventOptions = [{ label: RED._("alarm-clock.label.on"), event: "true" }, { label: RED._("alarm-clock.label.off"), event: "false" }];
 			// END check props
-			config.i18n = RED._("time-scheduler.ui", { returnObjects: true });
+			config.i18n = RED._("alarm-clock.ui", { returnObjects: true });
 			config.solarEventsEnabled = ((config.lat !== "" && isFinite(config.lat) && Math.abs(config.lat) <= 90) && (config.lon !== "" && isFinite(config.lon) && Math.abs(config.lon) <= 180)) ? true : false;
 
 			if (checkConfig(config, node)) {
@@ -354,13 +354,13 @@ module.exports = function(RED) {
 					beforeEmit: function(msg, value) {
 						if (msg.hasOwnProperty("disableDevice")) {
 							if (addDisabledDevice(msg.disableDevice)) {
-								node.status({ fill: "green", shape: "ring", text: msg.disableDevice + " " + RED._("time-scheduler.disabled") });
+								node.status({ fill: "green", shape: "ring", text: msg.disableDevice + " " + RED._("alarm-clock.disabled") });
 								msg.payload = serializeData();
 								node.send(msg);
 							}
 						} else if (msg.hasOwnProperty("enableDevice")) {
 							if (removeDisabledDevice(msg.enableDevice)) {
-								node.status({ fill: "green", shape: "dot", text: msg.enableDevice + " " + RED._("time-scheduler.enabled") });
+								node.status({ fill: "green", shape: "dot", text: msg.enableDevice + " " + RED._("alarm-clock.enabled") });
 								msg.payload = serializeData();
 								node.send(msg);
 							}
@@ -374,10 +374,10 @@ module.exports = function(RED) {
 
 								const parsedTimers = parsedInput.timers;
 								if (validateTimers(parsedTimers)) {
-									node.status({ fill: "green", shape: "dot", text: "time-scheduler.payloadReceived" });
+									node.status({ fill: "green", shape: "dot", text: "alarm-clock.payloadReceived" });
 									setTimers(parsedTimers.filter(timer => timer.output < config.devices.length));
 								} else {
-									node.status({ fill: "yellow", shape: "dot", text: "time-scheduler.invalidPayload" });
+									node.status({ fill: "yellow", shape: "dot", text: "alarm-clock.invalidPayload" });
 								}
 
 								if (parsedInput.settings) setSettings(parsedInput.settings);
@@ -659,7 +659,7 @@ module.exports = function(RED) {
 
 						$scope.getTimersFromServer = function() {
 							$.ajax({
-								url: "time-scheduler/getNode/" + $scope.nodeId, dataType: 'json',
+								url: "alarm-clock/getNode/" + $scope.nodeId, dataType: 'json',
 								beforeSend: function() {
 									$scope.loading = true;
 								},
@@ -688,7 +688,7 @@ module.exports = function(RED) {
 						node.status({});
 						timers = timers.filter(timer => timer.output < config.devices.length);
 					} else {
-						node.status({ fill: "green", shape: "dot", text: "time-scheduler.contextCreated" });
+						node.status({ fill: "green", shape: "dot", text: "alarm-clock.contextCreated" });
 						timers = [];
 					}
 					setTimers(timers);
@@ -922,14 +922,14 @@ module.exports = function(RED) {
 				});
 			}
 		} catch (error) {
-			console.log("TimeSchedulerNode:", error);
+			console.log("AlarmClockNode:", error);
 		}
 	}
-	RED.nodes.registerType("ui_time_scheduler", TimeSchedulerNode);
+	RED.nodes.registerType("ui_alarm_clock", AlarmClockNode);
 
 	let uiPath = ((RED.settings.ui || {}).path);
 	if (uiPath == undefined) uiPath = 'ui';
-	let nodePath = '/' + uiPath + '/time-scheduler/getNode/:nodeId';
+	let nodePath = '/' + uiPath + '/alarm-clock/getNode/:nodeId';
 	nodePath = nodePath.replace(/\/+/g, '/');
 
 	RED.httpNode.get(nodePath, function(req, res) {
