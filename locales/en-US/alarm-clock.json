@@ -29,8 +29,8 @@
         "topicDesc": "Send the alarm name via msg.topic",
         "copy": "copy",
         "ui": {
-            "start": "Start",
-            "starttime": "Starttime",
+            "alarm": "Alarm",
+            "alarmtime": "Alarm time",
             "end": "End",
             "overview": "Overview",
             "days": [
