@@ -338,7 +338,7 @@ module.exports = function(RED) {
 						setSettings(orig.msg[0].payload.settings);
 						const sendMsg = JSON.parse(JSON.stringify(orig.msg));
 						sendMsg[0].data = getNodeData();
-						sendMsg[0].payload = JSON.stringify(msg.data);
+						sendMsg[0].payload = JSON.stringify(sendMsg[0].data);
 						addOutputValues(sendMsg);
 						return sendMsg;
 					}
