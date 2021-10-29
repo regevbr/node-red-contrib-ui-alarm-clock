@@ -26,12 +26,10 @@
             "Friday",
             "Saturday"
         ],
-        "topicDesc": "Send the alarm name via msg.topic",
         "copy": "copy",
         "ui": {
             "alarm": "Alarm",
             "alarmtime": "Alarm time",
-            "end": "End",
             "overview": "Overview",
             "days": [
                 "SU",
@@ -64,7 +62,6 @@
             "emptyOverview": "Nothing planned yet. Click \"Overview\" and select an alarm.",
             "noActiveOverview": "No schedules are active. Click \"Overview\" and select an alarm.",
             "nothingPlanned": "Nothing planned yet. Click the plus sign to add a new timer.",
-            "alertTimespan": "Time frame exceeds midnight.\nDo you want to continue?",
             "selectAll": "Select All"
         }
     }

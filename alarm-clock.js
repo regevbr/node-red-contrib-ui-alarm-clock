@@ -667,7 +667,7 @@ module.exports = function(RED) {
 			function addOutputValues(outputValues) {
 				for (let alarm = 0; alarm < config.alarms.length; alarm++) {
 					const msg = { payload: isInTime(alarm) };
-					if (config.sendTopic) msg.topic = config.alarms[alarm];
+					msg.topic = config.alarms[alarm];
 					msg.payload != null ? outputValues.push(msg) : outputValues.push(null);
 				}
 				removeUnchangedValues(outputValues);
@@ -685,13 +685,13 @@ module.exports = function(RED) {
 
 			function isInTime(alarmIndex) {
 				const nodeTimers = getTimers();
-				let status = null;
+				let status = false;
 
 				if (nodeTimers.length > 0 && !getDisabledAlarms().includes(alarmIndex.toString())) {
 					const date = new Date();
 
 					nodeTimers.filter(timer => timer.output === alarmIndex).forEach(function(timer) {
-						if (status != null) return;
+						if (status !== status) return;
 						if (timer.hasOwnProperty("disabled")) return;
 
 						const utcDay = localDayToUtc(timer, date.getDay());

@@ -30,11 +30,6 @@
         </span>
     </div>
     <div class="form-row">
-        <label for="node-input-sendTopic"><i class="fa fa-tasks"></i> Topic</label>
-        <input type="checkbox" id="node-input-sendTopic" style="display: inline-block; width: auto; vertical-align: top;">
-        <span data-i18n="alarm-clock.topicDesc"></span>
-    </div>
-    <div class="form-row">
 		<label for="node-input-lat"><i class="fa fa-globe"></i> <span data-i18n="alarm-clock.label.latitude"></span> </label>
 		<input type="number" id="node-input-lat" min="-90" max="90" step="any" placeholder="48.3069" style="width:25%; margin-right: 6px;">
 		<label for="node-input-lon"><i class="fa fa-globe"></i> <span data-i18n="alarm-clock.label.longitude"></span> </label>
@@ -60,7 +55,6 @@
             startDay: { value: 0 },
             refresh: { value: 60 },
             alarms: { value: ["Alarm 1"] },
-            sendTopic: { value: false },
             lat: { value: '' },
             lon: { value: '' },
             customContextStore: { value: '' },
