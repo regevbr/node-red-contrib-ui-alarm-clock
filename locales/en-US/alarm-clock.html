@@ -10,7 +10,7 @@
         <dt>enableAlarm <span class="property-type">number | string</span> </dt>
         <dd> the alarm name or index to enable </dd>
         <dt>getStatus <span class="property-type">any</span> </dt>
-        <dd> triggers the node to send its data to the top output </dd>
+        <dd> triggers the node to send its data to the top output. Can be used to persist the schedule to to get the upcoming alarms information</dd>
     </dl>
 
     <h3>Outputs</h3>
@@ -18,7 +18,12 @@
         <li> Outputs new alarms and settings
             <dl class="message-properties">
                 <dt>payload <span class="property-type">JSON string</span></dt>
-                <dd>the modified or new alarms</dd>
+                <dd>The current schedule, settings and upcoming alerts (stringified). Useful for persisting schedule to disk</dd>
+            </dl>
+            <dl class="message-properties">
+                <dt>data <span class="property-type">JSON</span></dt>
+                <dd>The current schedule, settings and upcoming alerts</dd>
+                <dd>Upcoming alerts is a dictionary between alarm names and the epoch of the next alarm trigger time</dd>
             </dl>
         </li>
         <li> to N - Outputs alarm event

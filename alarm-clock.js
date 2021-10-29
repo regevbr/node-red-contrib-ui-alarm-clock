@@ -295,17 +295,20 @@ module.exports = function(RED) {
 					if (msg.hasOwnProperty("disableAlarm")) {
 						if (addDisabledAlarm(msg.disableAlarm)) {
 							node.status({ fill: "green", shape: "ring", text: msg.disableAlarm + " " + RED._("alarm-clock.disabled") });
-							msg.payload = serializeData();
+							msg.data = getNodeData();
+							msg.payload = JSON.stringify(msg.data);
 							node.send(msg);
 						}
 					} else if (msg.hasOwnProperty("enableAlarm")) {
 						if (removeDisabledAlarm(msg.enableAlarm)) {
 							node.status({ fill: "green", shape: "dot", text: msg.enableAlarm + " " + RED._("alarm-clock.enabled") });
-							msg.payload = serializeData();
+							msg.data = getNodeData();
+							msg.payload = JSON.stringify(msg.data);
 							node.send(msg);
 						}
 					} else if (msg.hasOwnProperty("getStatus")) {
-						msg.payload = serializeData();
+						msg.data = getNodeData();
+						msg.payload = JSON.stringify(msg.data);
 						node.send(msg);
 						return msg;
 					} else {
@@ -334,7 +337,8 @@ module.exports = function(RED) {
 						setAlarms(orig.msg[0].payload.alarms);
 						setSettings(orig.msg[0].payload.settings);
 						const sendMsg = JSON.parse(JSON.stringify(orig.msg));
-						sendMsg[0].payload = serializeData();
+						sendMsg[0].data = getNodeData();
+						sendMsg[0].payload = JSON.stringify(msg.data);
 						addOutputValues(sendMsg);
 						return sendMsg;
 					}
@@ -803,10 +807,6 @@ module.exports = function(RED) {
 
 			function getNodeData() {
 				return { alarms: getAlarms(), settings: getSettings(), upcoming: getUpcomingAlarms() };
-			}
-
-			function serializeData() {
-				return JSON.stringify(getNodeData());
 			}
 
 			node.nodeCallback = function nodeCallback(req, res) {
