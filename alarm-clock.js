@@ -672,7 +672,7 @@ module.exports = function(RED) {
 				for (let alarm = 0; alarm < config.alarm_names.length; alarm++) {
 					const msg = { payload: isInTime(alarm) };
 					msg.topic = config.alarm_names[alarm];
-					msg.payload != null ? outputValues.push(msg) : outputValues.push(null);
+					msg.payload ? outputValues.push(msg) : outputValues.push(null);
 				}
 				removeUnchangedValues(outputValues);
 			}
