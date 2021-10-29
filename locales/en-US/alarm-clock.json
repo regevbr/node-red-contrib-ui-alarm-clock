@@ -10,19 +10,12 @@
             "size": "Size",
             "group": "Group",
             "startDay": "First Day",
-            "singleOff": "Single Off",
-            "block": "Block",
             "refresh": "Refresh",
-            "customPayload": "User Events",
-            "on": "On",
-            "off": "Off",
             "context": "Context",
-            "eventMode": "Event Mode",
-            "eventOptions": "Event Options",
             "latitude": "Latitude",
             "longitude": "Longitude",
-            "devices": "Devices",
-            "device": "Device"
+            "alarms": "Alarms",
+            "alarm": "Alarm"
         },
         "days": [
             "Sunday",
@@ -33,19 +26,12 @@
             "Friday",
             "Saturday"
         ],
-        "customPayloadDesc": "Accept free-form frontend input for events",
-        "eventModeDesc": "Schedule single events rather than a time span",
-        "singleOffDesc": "Output \"off\" payloads only at the defined end time",
-        "onlySendChangeDesc": "Block device output unless value changes",
-        "topicDesc": "Send the device name via msg.topic",
+        "topicDesc": "Send the alarm name via msg.topic",
         "copy": "copy",
         "ui": {
             "start": "Start",
             "starttime": "Starttime",
             "end": "End",
-            "endtime": "Endtime",
-            "event": "Event",
-            "duration": "Duration",
             "overview": "Overview",
             "days": [
                 "SU",
@@ -75,8 +61,8 @@
             "nauticalDawn": "nautical dawn",
             "dawn": "dawn",
             "payloadWarning": "Invalid or no payload provided.",
-            "emptyOverview": "Nothing planned yet. Click \"Overview\" and select a device.",
-            "noActiveOverview": "No schedules are active. Click \"Overview\" and select a device.",
+            "emptyOverview": "Nothing planned yet. Click \"Overview\" and select an alarm.",
+            "noActiveOverview": "No schedules are active. Click \"Overview\" and select an alarm.",
             "nothingPlanned": "Nothing planned yet. Click the plus sign to add a new timer.",
             "alertTimespan": "Time frame exceeds midnight.\nDo you want to continue?",
             "selectAll": "Select All"

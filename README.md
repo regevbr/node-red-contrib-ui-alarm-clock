@@ -22,13 +22,13 @@ Click the plus sign at the top right corner of the node to create a new timer.
   
 ### Input
   
-You can inject timers via a msg property `payload` (see [restoring schedules after a reboot](#Restoring-schedules-after-a-reboot) section). If the injected msg has a property `disableDevice` or `enableDevice` the node will disable/enable the devices output. Disabling/enabling works both with device name and index.
+You can inject timers via a msg property `payload` (see [restoring schedules after a reboot](#Restoring-schedules-after-a-reboot) section). If the injected msg has a property `disableAlarm` or `enableAlarm` the node will disable/enable the alarms output. Disabling/enabling works both with alarm name and index.
   
 ### Output
   
 Whenever you add, edit or delete a timer a JSON string is sent to the nodes top output. This JSON string contains all timers and settings.
 
-Every other output (number of total outputs depends on how many devices you have added) emits true/false every 60 seconds. In Event Mode the event is only sent at the specified time. Adjusting the refresh rate, choosing if a msg.`topic` is sent and if messages are blocked unless the value has changed is possible within the node's options.
+Every other output (number of total outputs depends on how many alarms you have added) emits true/false every 60 seconds. In Event Mode the event is only sent at the specified time. Adjusting the refresh rate, choosing if a msg.`topic` is sent and if messages are blocked unless the value has changed is possible within the node's options.
 
 ### Restoring schedules after a reboot
   

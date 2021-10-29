@@ -84,23 +84,23 @@ module.exports = function(RED) {
 		const timerBody = String.raw`
 		<div id="${divPrimary}" ng-init='init(${JSON.stringify(config)})'>
 			<div layout="row" layout-align="space-between center" style="max-height: 50px;">
-				<span flex="65" ng-show="devices.length <= 1" style="height:50px; line-height: 50px;"> ${config.devices[0]} </span>
-				<span flex="65" ng-show="devices.length > 1">
+				<span flex="65" ng-show="alarms.length <= 1" style="height:50px; line-height: 50px;"> ${config.alarms[0]} </span>
+				<span flex="65" ng-show="alarms.length > 1">
 					<md-input-container>
-						<md-select class="nr-dashboard-dropdown" ng-model="myDeviceSelect" ng-change="showStandardView()" aria-label="Select device" ng-disabled="isEditMode">
+						<md-select class="nr-dashboard-dropdown" ng-model="myAlarmSelect" ng-change="showStandardView()" aria-label="Select alarm" ng-disabled="isEditMode">
 							<md-option value="overview"> ${RED._("alarm-clock.ui.overview")} </md-option>
-							<md-option ng-repeat="device in devices" value={{$index}}> {{devices[$index]}} </md-option>
+							<md-option ng-repeat="alarm in alarms" value={{$index}}> {{alarms[$index]}} </md-option>
 						</md-select>
 					</md-input-container>
 				</span>
 				<span flex="35" layout="row" layout-align="end center" style="height: 50px;">
-					<md-button style="width: 40px; height: 36px; margin-right: 4px;" aria-label="device enabled" ng-if="myDeviceSelect !== 'overview' && !isEditMode" ng-click="toggleDeviceStatus(myDeviceSelect)" >
-						<md-icon> {{isDeviceEnabled(myDeviceSelect) ? "alarm_on" : "alarm_off"}} </md-icon>
+					<md-button style="width: 40px; height: 36px; margin-right: 4px;" aria-label="alarm enabled" ng-if="myAlarmSelect !== 'overview' && !isEditMode" ng-click="toggleAlarmStatus(myAlarmSelect)" >
+						<md-icon> {{isAlarmEnabled(myAlarmSelect) ? "alarm_on" : "alarm_off"}} </md-icon>
 					</md-button>
-					<md-button style="width: 40px; height: 36px; margin: 0px;" aria-label="Add" ng-if="myDeviceSelect !== 'overview'" ng-click="toggleViews()" ng-disabled="loading">
+					<md-button style="width: 40px; height: 36px; margin: 0px;" aria-label="Add" ng-if="myAlarmSelect !== 'overview'" ng-click="toggleViews()" ng-disabled="loading">
 						<md-icon> {{isEditMode ? "close" : "add"}} </md-icon>
 					</md-button>
-					<md-fab-speed-dial md-direction="down" class="md-scale" style="max-height: 36px;" ng-if="myDeviceSelect === 'overview'">
+					<md-fab-speed-dial md-direction="down" class="md-scale" style="max-height: 36px;" ng-if="myAlarmSelect === 'overview'">
 						<md-fab-trigger style="width: 84px;">
 							<md-button aria-label="filter" style="width: 100%; margin: 0px;"><md-icon> filter_alt </md-icon></md-button>
 						</md-fab-trigger>
@@ -117,14 +117,14 @@ module.exports = function(RED) {
 			</div>
 			<div id="messageBoard-${uniqueId}" style="display:none;"> <p> </p> </div>
 			<div id="overview-${uniqueId}" style="display:none;">
-				<div ng-repeat="device in devices track by $index">
-					<md-list flex ng-cloak ng-if="(filteredDeviceTimers = (getTimersByOverviewFilter() | filter:{ output: $index.toString() }:true)).length">
-						<md-subheader> <span class="md-subhead"> {{devices[$index]}} </span> </md-subheader>
-						<md-list-item ng-repeat="timer in filteredDeviceTimers" style="min-height: 25px; height: 25px; padding: 0 2px;">
-							<span style="overflow-x: hidden; {{(timer.disabled || !isDeviceEnabled(timer.output)) ? 'opacity: 0.4;' : ''}}">
-								{{millisToTime(timer.starttime)}}&#8209;${config.eventMode ? `{{eventToEventLabel(timer.event)}}` : `{{millisToTime(timer.endtime)}}`}
+				<div ng-repeat="alarm in alarms track by $index">
+					<md-list flex ng-cloak ng-if="(filteredAlarmTimers = (getTimersByOverviewFilter() | filter:{ output: $index.toString() }:true)).length">
+						<md-subheader> <span class="md-subhead"> {{alarms[$index]}} </span> </md-subheader>
+						<md-list-item ng-repeat="timer in filteredAlarmTimers" style="min-height: 25px; height: 25px; padding: 0 2px;">
+							<span style="overflow-x: hidden; {{(timer.disabled || !isAlarmEnabled(timer.output)) ? 'opacity: 0.4;' : ''}}">
+								{{millisToTime(timer.starttime)}}
 							</span>
-							<div class="md-secondary" style=" {{(timer.disabled || !isDeviceEnabled(timer.output)) ? 'opacity: 0.4' : ''}};">
+							<div class="md-secondary" style=" {{(timer.disabled || !isAlarmEnabled(timer.output)) ? 'opacity: 0.4' : ''}};">
 								<span ng-repeat="day in days | limitTo : ${config.startDay}-7" ng-init="dayIndex=$index+${config.startDay}">{{timer.days[localDayToUtc(timer,dayIndex)]===1 ? ($index!=0 ? "&nbsp;" : "")+days[dayIndex] : ""}}</span>
 								<span ng-repeat="day in days | limitTo : -${config.startDay}" ng-init="dayIndex=$index">{{timer.days[localDayToUtc(timer,dayIndex)]===1 ? ($index!=0 ? "&nbsp;" : "")+days[dayIndex] : ""}}</span>
 							</div>
@@ -144,28 +144,14 @@ module.exports = function(RED) {
 					<md-subheader>
 						<div layout="row" class="md-subhead">
 							<span flex=""> # </span>
-							${config.eventMode ? `
 							<span flex="40"> ${RED._("alarm-clock.ui.start")} </span>
-							<span flex="45"> ${RED._("alarm-clock.ui.event")} </span>
-							` : `
-							<span flex="30"> ${RED._("alarm-clock.ui.start")} </span>
-							<span flex="30"> ${RED._("alarm-clock.ui.end")} </span>
-							<span flex="25"> ${RED._("alarm-clock.ui.duration")} </span>
-							`}
 						</div>
 					</md-subheader>
-					<md-list-item class="md-2-line" style="height: 74px; padding: 0 5px; border-left: 2px solid {{timer.disabled ? 'red' : timer.startSolarEvent ? '#FCD440' : 'transparent'}};" ng-repeat="timer in timers | filter:{ output: myDeviceSelect }:true track by $index">
+					<md-list-item class="md-2-line" style="height: 74px; padding: 0 5px; border-left: 2px solid {{timer.disabled ? 'red' : timer.startSolarEvent ? '#FCD440' : 'transparent'}};" ng-repeat="timer in timers | filter:{ output: myAlarmSelect }:true track by $index">
 						<div class="md-list-item-text" ng-click="showAddView(timers.indexOf(timer))" style="opacity:{{timer.disabled ? 0.4 : 1}};">
 							<div layout="row">
 								<span flex=""> {{$index+1}} </span>
-								${config.eventMode ? `
 								<span flex="40"> {{millisToTime(timer.starttime)}} </span>
-								<span flex="45"> {{eventToEventLabel(timer.event)}} </span>
-								` : `
-								<span flex="30"> {{millisToTime(timer.starttime)}} </span>
-								<span flex="30"> {{millisToTime(timer.endtime)}} </span>
-								<span flex="25"> {{minutesToReadable(diff(timer.starttime,timer.endtime))}} </span>
-								`}
 							</div>
 							<div layout="row" style="padding-top: 4px; padding-bottom: 4px;">
 								<span flex="" ng-repeat="day in days | limitTo : ${config.startDay}-7" ng-init="dayIndex=$index+${config.startDay}">
@@ -194,29 +180,6 @@ module.exports = function(RED) {
 								<input ng-model="formtimer.solarStarttimeLabel" type="text" required disabled>
 								<span class="validity"></span>
 							</md-input-container>
-							${config.eventMode ? `
-							<md-input-container flex="">
-								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.event")}</label>
-								${config.customPayload ? `
-								<input ng-model="formtimer.timerEvent" required autocomplete="off">
-								` : `
-								<md-select class="nr-dashboard-dropdown" ng-model="formtimer.timerEvent" required>
-									<md-option ng-repeat="option in eventOptions" value={{option.event}}> {{option.label}} </md-option>
-								</md-select>
-								`}
-							</md-input-container>
-							` : `
-							<md-input-container flex="50" ng-show="formtimer.starttype === 'custom'">
-								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.endtime")}</label>
-								<input id="timerEndtime-${uniqueId}" value="10:00" type="time" required pattern="^([0-1][0-9]|2[0-3]):([0-5][0-9])$">
-								<span class="validity"></span>
-							</md-input-container>
-							<md-input-container flex="50" ng-if="formtimer.starttype !== 'custom'">
-								<label style="color: var(--nr-dashboard-widgetTextColor)">${RED._("alarm-clock.ui.endtime")}</label>
-								<input ng-model="formtimer.solarEndtimeLabel" type="text" required disabled> </input>
-								<span class="validity"></span>
-							</md-input-container>
-							`}
 						</div>
 						<div layout="row" style="max-height: 50px;">
 							<md-input-container>
@@ -266,29 +229,6 @@ module.exports = function(RED) {
 							</md-input-container>
 						</div>
 						<div layout="row" style="height: 50px;">
-							<md-input-container ng-if="!${config.eventMode} && formtimer.starttype!='custom'">
-								<label style="color: var(--nr-dashboard-widgetTextColor)">Endtype</label>
-								<md-select class="nr-dashboard-dropdown" ng-model="formtimer.endtype" ng-change="updateSolarLabels()">
-									<md-option value="sunrise"> ${RED._("alarm-clock.ui.sunrise")} </md-option>
-									<md-option value="sunriseEnd"> ${RED._("alarm-clock.ui.sunriseEnd")} </md-option>
-									<md-option value="goldenHourEnd"> ${RED._("alarm-clock.ui.goldenHourEnd")} </md-option>
-									<md-option value="solarNoon"> ${RED._("alarm-clock.ui.solarNoon")} </md-option>
-									<md-option value="goldenHour"> ${RED._("alarm-clock.ui.goldenHour")} </md-option>
-									<md-option value="sunsetStart"> ${RED._("alarm-clock.ui.sunsetStart")} </md-option>
-									<md-option value="sunset"> ${RED._("alarm-clock.ui.sunset")} </md-option>
-									<md-option value="dusk"> ${RED._("alarm-clock.ui.dusk")} </md-option>
-									<md-option value="nauticalDusk"> ${RED._("alarm-clock.ui.nauticalDusk")} </md-option>
-									<md-option value="night"> ${RED._("alarm-clock.ui.night")} </md-option>
-									<md-option value="nadir"> ${RED._("alarm-clock.ui.nadir")} </md-option>
-									<md-option value="nightEnd"> ${RED._("alarm-clock.ui.nightEnd")} </md-option>
-									<md-option value="nauticalDawn"> ${RED._("alarm-clock.ui.nauticalDawn")} </md-option>
-									<md-option value="dawn"> ${RED._("alarm-clock.ui.dawn")} </md-option>
-								</md-select>
-							</md-input-container>
-							<md-input-container flex="40" ng-if="!${config.eventMode} && formtimer.starttype!='custom'">
-								<label style="color: var(--nr-dashboard-widgetTextColor)">Offset (min)</label>
-								<input type="number" ng-model="formtimer.endOffset" ng-change="offsetValidation('end')">
-							</md-input-container>
 						</div>
 						<div layout="row" layout-align="space-between end" style="height: 50px;">
 							<md-button style="margin: 1px;" aria-label="suntimer" ng-click="showSunSettings=!showSunSettings"> <md-icon> arrow_back </md-icon> </md-button>
@@ -332,8 +272,7 @@ module.exports = function(RED) {
 			if (!config.hasOwnProperty("startDay")) config.startDay = 0;
 			if (!config.hasOwnProperty("height") || config.height == 0) config.height = 1;
 			if (!config.hasOwnProperty("name") || config.name === "") config.name = "Alarm-Clock";
-			if (!config.hasOwnProperty("devices") || config.devices.length === 0) config.devices = [config.name];
-			if (!config.hasOwnProperty("eventOptions")) config.eventOptions = [{ label: RED._("alarm-clock.label.on"), event: "true" }, { label: RED._("alarm-clock.label.off"), event: "false" }];
+			if (!config.hasOwnProperty("alarms") || config.alarms.length === 0) config.alarms = [config.name];
 			// END check props
 			config.i18n = RED._("alarm-clock.ui", { returnObjects: true });
 			config.solarEventsEnabled = ((config.lat !== "" && isFinite(config.lat) && Math.abs(config.lat) <= 90) && (config.lon !== "" && isFinite(config.lon) && Math.abs(config.lon) <= 180)) ? true : false;
@@ -352,15 +291,15 @@ module.exports = function(RED) {
 					storeFrontEndInputAsState: true,
 					persistantFrontEndValue: true,
 					beforeEmit: function(msg, value) {
-						if (msg.hasOwnProperty("disableDevice")) {
-							if (addDisabledDevice(msg.disableDevice)) {
-								node.status({ fill: "green", shape: "ring", text: msg.disableDevice + " " + RED._("alarm-clock.disabled") });
+						if (msg.hasOwnProperty("disableAlarm")) {
+							if (addDisabledAlarm(msg.disableAlarm)) {
+								node.status({ fill: "green", shape: "ring", text: msg.disableAlarm + " " + RED._("alarm-clock.disabled") });
 								msg.payload = serializeData();
 								node.send(msg);
 							}
-						} else if (msg.hasOwnProperty("enableDevice")) {
-							if (removeDisabledDevice(msg.enableDevice)) {
-								node.status({ fill: "green", shape: "dot", text: msg.enableDevice + " " + RED._("alarm-clock.enabled") });
+						} else if (msg.hasOwnProperty("enableAlarm")) {
+							if (removeDisabledAlarm(msg.enableAlarm)) {
+								node.status({ fill: "green", shape: "dot", text: msg.enableAlarm + " " + RED._("alarm-clock.enabled") });
 								msg.payload = serializeData();
 								node.send(msg);
 							}
@@ -375,7 +314,7 @@ module.exports = function(RED) {
 								const parsedTimers = parsedInput.timers;
 								if (validateTimers(parsedTimers)) {
 									node.status({ fill: "green", shape: "dot", text: "alarm-clock.payloadReceived" });
-									setTimers(parsedTimers.filter(timer => timer.output < config.devices.length));
+									setTimers(parsedTimers.filter(timer => timer.output < config.alarms.length));
 								} else {
 									node.status({ fill: "yellow", shape: "dot", text: "alarm-clock.invalidPayload" });
 								}
@@ -404,10 +343,8 @@ module.exports = function(RED) {
 							$scope.nodeId = config.id;
 							$scope.i18n = config.i18n;
 							$scope.days = config.i18n.days;
-							$scope.devices = config.devices;
-							$scope.myDeviceSelect = $scope.devices.length > 1 ? "overview" : "0";
-							$scope.eventMode = config.eventMode;
-							$scope.eventOptions = config.eventOptions;
+							$scope.alarms = config.alarms;
+							$scope.myAlarmSelect = $scope.alarms.length > 1 ? "overview" : "0";
 						}
 
 						$scope.$watch('msg', function() {
@@ -431,10 +368,10 @@ module.exports = function(RED) {
 								const msgBoard = $scope.getElement("messageBoard");
 								msgBoard.style.display = "block";
 								msgBoard.firstElementChild.innerHTML = $scope.i18n.payloadWarning;
-							} else if ($scope.myDeviceSelect === "overview") {
+							} else if ($scope.myAlarmSelect === "overview") {
 								$scope.getElement("timersView").style.display = "none";
 								$scope.getElement("overview").style.display = "block";
-							} else if ($scope.timers.filter(timer => timer.output == $scope.myDeviceSelect).length === 0) {
+							} else if ($scope.timers.filter(timer => timer.output == $scope.myAlarmSelect).length === 0) {
 								$scope.getElement("timersView").style.display = "none";
 
 								const msgBoard = $scope.getElement("messageBoard");
@@ -459,11 +396,6 @@ module.exports = function(RED) {
 								if (today.getHours() == "23" && today.getMinutes() >= "54") today.setMinutes(53);
 								const start = new Date(today.getFullYear(), today.getMonth(), today.getDay(), today.getHours(), today.getMinutes() + 1, 0);
 								$scope.getElement("timerStarttime").value = $scope.formatTime(start.getHours(), start.getMinutes());
-								if ($scope.eventMode) $scope.formtimer.timerEvent = $scope.eventOptions.length > 0 ? $scope.eventOptions[0].event : "true";
-								else {
-									const end = new Date(today.getFullYear(), today.getMonth(), today.getDay(), today.getHours(), today.getMinutes() + 6, 0);
-									$scope.getElement("timerEndtime").value = $scope.formatTime(end.getHours(), end.getMinutes());
-								}
 								$scope.formtimer.dayselect.push(today.getDay());
 								$scope.formtimer.disabled = false;
 							} else {
@@ -475,11 +407,6 @@ module.exports = function(RED) {
 								$scope.updateSolarLabels();
 								const start = new Date(timer.starttime);
 								$scope.getElement("timerStarttime").value = $scope.formatTime(start.getHours(), start.getMinutes());
-								if ($scope.eventMode) $scope.formtimer.timerEvent = timer.event;
-								else {
-									const end = new Date(timer.endtime);
-									$scope.getElement("timerEndtime").value = $scope.formatTime(end.getHours(), end.getMinutes());
-								}
 								for (let i = 0; i < timer.days.length; i++) {
 									if (timer.days[$scope.localDayToUtc(timer, i)]) $scope.formtimer.dayselect.push(i);
 								}
@@ -495,33 +422,12 @@ module.exports = function(RED) {
 							const timer = {
 								starttime: starttime,
 								days: [0, 0, 0, 0, 0, 0, 0],
-								output: $scope.myDeviceSelect
+								output: $scope.myAlarmSelect
 							};
 
 							if ($scope.formtimer.starttype !== "custom") {
 								timer.startSolarEvent = $scope.formtimer.starttype;
 								timer.startSolarOffset = $scope.formtimer.startOffset;
-							}
-
-							if ($scope.eventMode) {
-								timer.event = $scope.formtimer.timerEvent;
-								if (timer.event === "true" || timer.event === true) {
-									timer.event = true;
-								} else if (timer.event === "false" || timer.event === false) {
-									timer.event = false;
-								} else if (!isNaN(timer.event) && (timer.event === "0" || (timer.event + "").charAt(0) != "0")) {
-									timer.event = Number(timer.event);
-								}
-							} else {
-								const endInput = $scope.getElement("timerEndtime").value.split(":");
-								let endtime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endInput[0], endInput[1], 0, 0).getTime();
-
-								if ($scope.formtimer.starttype === "custom" && $scope.diff(starttime, endtime) < 1) {
-									if (confirm($scope.i18n.alertTimespan)) endtime += 24 * 60 * 60 * 1000;
-									else return;
-								}
-
-								timer.endtime = endtime;
 							}
 
 							$scope.formtimer.dayselect.forEach(day => {
@@ -551,7 +457,7 @@ module.exports = function(RED) {
 							$scope.msg[0].payload = {
 								timers: angular.copy($scope.timers),
 								settings: {
-									disabledDevices: angular.copy($scope.disabledDevices),
+									disabledAlarms: angular.copy($scope.disabledAlarms),
 									overviewFilter: angular.copy($scope.overviewFilter)
 								}
 							};
@@ -568,11 +474,6 @@ module.exports = function(RED) {
 
 						$scope.minutesToReadable = function(minutes) {
 							return (Math.floor(minutes / 60) > 0 ? Math.floor(minutes / 60) + "h " : "") + (minutes % 60 > 0 ? minutes % 60 + "m" : "");
-						}
-
-						$scope.eventToEventLabel = function(event) {
-							const option = $scope.eventOptions.find(o => { return o.event === event.toString() });
-							return option ? option.label : event;
 						}
 
 						$scope.millisToTime = function(millis) {
@@ -639,22 +540,22 @@ module.exports = function(RED) {
 
 						$scope.getTimersByOverviewFilter = function() {
 							if ($scope.overviewFilter == 'all') return $scope.timers;
-							return $scope.timers ? $scope.timers.filter(t => !t.disabled && $scope.isDeviceEnabled(t.output)) : [];
+							return $scope.timers ? $scope.timers.filter(t => !t.disabled && $scope.isAlarmEnabled(t.output)) : [];
 						}
 
-						$scope.toggleDeviceStatus = function(deviceIndex) {
-							if ($scope.isDeviceEnabled(deviceIndex)) {
-								$scope.disabledDevices = $scope.disabledDevices || [];
-								$scope.disabledDevices.push(deviceIndex);
+						$scope.toggleAlarmStatus = function(alarmIndex) {
+							if ($scope.isAlarmEnabled(alarmIndex)) {
+								$scope.disabledAlarms = $scope.disabledAlarms || [];
+								$scope.disabledAlarms.push(alarmIndex);
 							} else {
-								$scope.disabledDevices.splice($scope.disabledDevices.indexOf(deviceIndex), 1);
+								$scope.disabledAlarms.splice($scope.disabledAlarms.indexOf(alarmIndex), 1);
 							}
 							$scope.sendTimersToOutput();
 						}
 
-						$scope.isDeviceEnabled = function(deviceIndex) {
-							const disabledDevices = $scope.disabledDevices || [];
-							return !disabledDevices.includes(deviceIndex.toString());
+						$scope.isAlarmEnabled = function(alarmIndex) {
+							const disabledAlarms = $scope.disabledAlarms || [];
+							return !disabledAlarms.includes(alarmIndex.toString());
 						}
 
 						$scope.getTimersFromServer = function() {
@@ -665,7 +566,7 @@ module.exports = function(RED) {
 								},
 								success: function(json) {
 									$scope.timers = json.timers;
-									$scope.disabledDevices = json.settings.disabledDevices;
+									$scope.disabledAlarms = json.settings.disabledAlarms;
 									$scope.overviewFilter = json.settings.overviewFilter;
 									$scope.$digest();
 								},
@@ -686,7 +587,7 @@ module.exports = function(RED) {
 					let timers = getContextValue('timers');
 					if (validateTimers(timers)) {
 						node.status({});
-						timers = timers.filter(timer => timer.output < config.devices.length);
+						timers = timers.filter(timer => timer.output < config.alarms.length);
 					} else {
 						node.status({ fill: "green", shape: "dot", text: "alarm-clock.contextCreated" });
 						timers = [];
@@ -697,9 +598,7 @@ module.exports = function(RED) {
 
 				function validateTimers(timers) {
 					return Array.isArray(timers) && timers.every(element => {
-						if ((!element.hasOwnProperty("starttime") || !element.hasOwnProperty("days")) ||
-							(!config.eventMode && !element.hasOwnProperty("endtime")) ||
-							(config.eventMode && !element.hasOwnProperty("event"))) return false;
+						if ((!element.hasOwnProperty("starttime") || !element.hasOwnProperty("days")) || element.hasOwnProperty("event")) return false;
 
 						if (!element.hasOwnProperty("output")) element.output = "0";
 						else if (Number.isInteger(element.output)) element.output = element.output.toString();
@@ -739,31 +638,31 @@ module.exports = function(RED) {
 					setContextValue('settings', settings);
 				}
 
-				function getDisabledDevices() {
-					return getSettings().disabledDevices || [];
+				function getDisabledAlarms() {
+					return getSettings().disabledAlarms || [];
 				}
 
-				function setDisabledDevices(disabledDevices) {
-					setSettings({ ...getSettings(), disabledDevices });
+				function setDisabledAlarms(disabledAlarms) {
+					setSettings({ ...getSettings(), disabledAlarms });
 				}
 
-				function addDisabledDevice(device) {
-					const disabledDevices = getDisabledDevices();
-					const deviceIndex = (isNaN(device) ? config.devices.indexOf(device) : device).toString();
-					if (deviceIndex >= 0 && config.devices.length > deviceIndex && !disabledDevices.includes(deviceIndex)) {
-						disabledDevices.push(deviceIndex);
-						setDisabledDevices(disabledDevices);
+				function addDisabledAlarm(alarm) {
+					const disabledAlarms = getDisabledAlarms();
+					const alarmIndex = (isNaN(alarm) ? config.alarms.indexOf(alarm) : alarm).toString();
+					if (alarmIndex >= 0 && config.alarms.length > alarmIndex && !disabledAlarms.includes(alarmIndex)) {
+						disabledAlarms.push(alarmIndex);
+						setDisabledAlarms(disabledAlarms);
 						return true;
 					}
 					return false;
 				}
 
-				function removeDisabledDevice(device) {
-					const disabledDevices = getDisabledDevices();
-					const deviceIndex = (isNaN(device) ? config.devices.indexOf(device) : device).toString();
-					if (deviceIndex >= 0 && config.devices.length > deviceIndex && disabledDevices.includes(deviceIndex)) {
-						disabledDevices.splice(disabledDevices.indexOf(deviceIndex), 1);
-						setDisabledDevices(disabledDevices);
+				function removeDisabledAlarm(alarm) {
+					const disabledAlarms = getDisabledAlarms();
+					const alarmIndex = (isNaN(alarm) ? config.alarms.indexOf(alarm) : alarm).toString();
+					if (alarmIndex >= 0 && config.alarms.length > alarmIndex && disabledAlarms.includes(alarmIndex)) {
+						disabledAlarms.splice(disabledAlarms.indexOf(alarmIndex), 1);
+						setDisabledAlarms(disabledAlarms);
 						return true;
 					}
 					return false;
@@ -785,17 +684,17 @@ module.exports = function(RED) {
 				}
 
 				function addOutputValues(outputValues) {
-					for (let device = 0; device < config.devices.length; device++) {
-						const msg = { payload: isInTime(device) };
-						if (config.sendTopic) msg.topic = config.devices[device];
+					for (let alarm = 0; alarm < config.alarms.length; alarm++) {
+						const msg = { payload: isInTime(alarm) };
+						if (config.sendTopic) msg.topic = config.alarms[alarm];
 						msg.payload != null ? outputValues.push(msg) : outputValues.push(null);
 					}
-					if (config.onlySendChange) removeUnchangedValues(outputValues);
+					removeUnchangedValues(outputValues);
 				}
 
 				function removeUnchangedValues(outputValues) {
 					const currMsg = JSON.parse(JSON.stringify(outputValues));
-					for (let i = 1; i <= config.devices.length; i++) {
+					for (let i = 1; i <= config.alarms.length; i++) {
 						if (prevMsg[i] && currMsg[i] && (prevMsg[i].payload === currMsg[i].payload)) {
 							outputValues[i] = null;
 						}
@@ -803,20 +702,20 @@ module.exports = function(RED) {
 					prevMsg = currMsg;
 				}
 
-				function isInTime(deviceIndex) {
+				function isInTime(alarmIndex) {
 					const nodeTimers = getTimers();
 					let status = null;
 
-					if (nodeTimers.length > 0 && !getDisabledDevices().includes(deviceIndex.toString())) {
+					if (nodeTimers.length > 0 && !getDisabledAlarms().includes(alarmIndex.toString())) {
 						const date = new Date();
 
-						nodeTimers.filter(timer => timer.output == deviceIndex).forEach(function(timer) {
+						nodeTimers.filter(timer => timer.output == alarmIndex).forEach(function(timer) {
 							if (status != null) return;
 							if (timer.hasOwnProperty("disabled")) return;
 
 							const utcDay = localDayToUtc(timer, date.getDay());
 							const localStarttime = new Date(timer.starttime);
-							const localEndtime = config.eventMode ? localStarttime : new Date(timer.endtime);
+							const localEndtime = localStarttime;
 							const daysDiff = localEndtime.getDay() - localStarttime.getDay();
 
 							if (daysDiff != 0) {
@@ -840,21 +739,12 @@ module.exports = function(RED) {
 							compareDate.setHours(date.getHours());
 							compareDate.setMinutes(date.getMinutes());
 
-							if (config.eventMode) {
-								if (compareDate.getTime() == localStarttime.getTime()) {
-									status = timer.event;
-								}
-							} else {
-								if (compareDate.getTime() >= localStarttime.getTime() && compareDate.getTime() < localEndtime.getTime()) {
-									status = true;
-								} else if (compareDate.getTime() == localEndtime.getTime()) {
-									status = false;
-								}
+							if (compareDate.getTime() == localStarttime.getTime()) {
+								status = true;
 							}
 						});
 					}
 
-					if (!config.eventMode && !config.singleOff && status == null) status = false;
 					return status;
 				}
 
